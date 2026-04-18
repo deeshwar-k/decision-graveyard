@@ -1,0 +1,9 @@
+{
+  "name": "decision-graveyard",
+  "version": "1.0.0",
+  "description": "Decision Graveyard Backend (Vercel)",
+  "dependencies": {
+    "@google/generative-ai": "^0.2.1",
+    "firebase-admin": "^12.0.0"
+  }
+}

@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Timeline – Decision Graveyard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="home theme.css">
+    <link rel="stylesheet" href="timetheme.css">
+</head>
+<body>
+
+    <header>
+        <a href="home page.html" class="header-logo">Decision <span>Graveyard</span></a>
+        <div class="profile">
+            <span class="profile-name">Name</span>
+            <div class="avatar" id="avatarBtn">N</div>
+            <div class="dropdown" id="dropdown">
+                <p>Name</p>
+                <hr>
+                <a href="settings.html">Settings</a>
+                <a href="#" id="logoutBtn">Log out</a>
+            </div>
+        </div>
+    </header>
+
+    <div class="body-wrap">
+
+        <nav>
+            <ul class="links">
+                <li><a href="home page.html">🏠 Home</a></li>
+                <li><a href="Decision_form.html">➕ Add Decision</a></li>
+                <li><a href="Timeline page.html" class="active">📅 Timeline</a></li>
+                <li><a href="insights.html">📊 Insights</a></li>
+                <li><a href="lessons.html">📖 Lessons</a></li>
+            </ul>
+        </nav>
+
+        <main class="main-content">
+
+            <div class="hero">
+                <h1 class="hero-title">Timeline</h1>
+                <p class="hero-sub">Every decision you've ever logged, laid out in order. See how your choices connect over time.</p>
+            </div>
+
+            <div class="toolbar">
+                <div class="search-wrap">
+                    <svg class="search-icon" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="9" cy="9" r="6" stroke="#888899" stroke-width="1.6"/>
+                        <path d="M13.5 13.5L17 17" stroke="#888899" stroke-width="1.6" stroke-linecap="round"/>
+                    </svg>
+                    <input type="text" id="searchInput" class="search-input" placeholder="Search decisions…" autocomplete="off">
+                    <button class="search-clear" id="clearBtn" aria-label="Clear search">✕</button>
+                </div>
+                <div class="filters">
+                    <select id="categoryFilter" class="filter-select">
+                        <option value="">All categories</option>
+                        <option value="career">Career</option>
+                        <option value="finance">Finance</option>
+                        <option value="health">Health</option>
+                        <option value="personal">Personal</option>
+                        <option value="education">Education</option>
+                        <option value="other">Other</option>
+                    </select>
+                    <select id="outcomeFilter" class="filter-select">
+                        <option value="">All outcomes</option>
+                        <option value="success">Success</option>
+                        <option value="failure">Failure</option>
+                        <option value="ongoing">Still unfolding</option>
+                    </select>
+                </div>
+            </div>
+
+            <p class="results-count" id="resultsCount">Showing 0 decisions</p>
+
+            <div class="timeline" id="timeline">
+
+                        <div class="tl-item success" data-title="Switched to a plant-based diet" data-category="health" data-outcome="success" data-date="2024-11-01">
+                            <div class="tl-dot"></div>
+                            <div class="tl-card">
+                                <div class="tl-card-top">
+                                    <span class="tl-date">1 Nov 2024</span>
+                                    <span class="tl-badge">Health</span>
+                                    <span class="tl-outcome-pill">Success</span>
+                                    <div class="tl-actions">
+                                        <button class="tl-btn edit-btn" title="Edit">✏️</button>
+                                        <button class="tl-btn delete-btn" title="Delete">🗑️</button>
+                                    </div>
+                                </div>
+                                <div class="tl-title">Switched to a plant-based diet</div>
+                                <p class="tl-note">Removed meat and dairy for 90 days. Felt better by week 3 and decided to keep going. One of the better choices I've made.</p>
+                                <div class="tl-tags">
+                                    <span class="tl-tag">health</span>
+                                    <span class="tl-tag">identity</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="tl-item failure" data-title="Dropped an online course halfway" data-category="education" data-outcome="failure" data-date="2024-08-14">
+                            <div class="tl-dot"></div>
+                            <div class="tl-card">
+                                <div class="tl-card-top">
+                                    <span class="tl-date">14 Aug 2024</span>
+                                    <span class="tl-badge">Education</span>
+                                    <span class="tl-outcome-pill">Failure</span>
+                                    <div class="tl-actions">
+                                        <button class="tl-btn edit-btn" title="Edit">✏️</button>
+                                        <button class="tl-btn delete-btn" title="Delete">🗑️</button>
+                                    </div>
+                                </div>
+                                <div class="tl-title">Dropped an online course halfway</div>
+                                <p class="tl-note">Signed up for a full-stack bootcamp, burned out after Module 4. Paid full price, completed 40%. Distraction or discipline problem?</p>
+                                <div class="tl-tags">
+                                    <span class="tl-tag">burnout</span>
+                                    <span class="tl-tag">commitment</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="tl-item success" data-title="Moved to a new city alone" data-category="personal" data-outcome="success" data-date="2024-06-01">
+                            <div class="tl-dot"></div>
+                            <div class="tl-card">
+                                <div class="tl-card-top">
+                                    <span class="tl-date">1 Jun 2024</span>
+                                    <span class="tl-badge">Lifestyle</span>
+                                    <span class="tl-outcome-pill">Success</span>
+                                    <div class="tl-actions">
+                                        <button class="tl-btn edit-btn" title="Edit">✏️</button>
+                                        <button class="tl-btn delete-btn" title="Delete">🗑️</button>
+                                    </div>
+                                </div>
+                                <div class="tl-title">Moved to a new city alone</div>
+                                <p class="tl-note">Left home at 22 with no contacts in the new city. Terrifying, then liberating. Changed how I think about independence.</p>
+                                <div class="tl-tags">
+                                    <span class="tl-tag">growth</span>
+                                    <span class="tl-tag">courage</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="tl-item ongoing" data-title="Started journaling every morning" data-category="personal" data-outcome="ongoing" data-date="2024-01-01">
+                            <div class="tl-dot"></div>
+                            <div class="tl-card">
+                                <div class="tl-card-top">
+                                    <span class="tl-date">1 Jan 2024</span>
+                                    <span class="tl-badge">Lifestyle</span>
+                                    <span class="tl-outcome-pill">Still unfolding</span>
+                                    <div class="tl-actions">
+                                        <button class="tl-btn edit-btn" title="Edit">✏️</button>
+                                        <button class="tl-btn delete-btn" title="Delete">🗑️</button>
+                                    </div>
+                                </div>
+                                <div class="tl-title">Started journaling every morning</div>
+                                <p class="tl-note">New Year commitment. Have missed maybe 20 days in 15 months. Unsure if it's doing anything but reluctant to stop.</p>
+                                <div class="tl-tags">
+                                    <span class="tl-tag">habit</span>
+                                    <span class="tl-tag">reflection</span>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="empty-state" id="emptyState" style="display:none;">
+                <div class="empty-icon">🔍</div>
+                <p class="empty-text">No decisions match your search.</p>
+                <button class="empty-reset" id="resetBtn">Clear filters</button>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- DELETE CONFIRMATION MODAL -->
+    <div class="modal-overlay" id="deleteModal">
+        <div class="modal">
+            <div class="modal-icon">🗑️</div>
+            <h2 class="modal-title">Delete this decision?</h2>
+            <p class="modal-sub">This action cannot be undone.</p>
+            <div class="modal-actions">
+                <button class="btn-modal-cancel" id="cancelDelete">Cancel</button>
+                <button class="btn-modal-confirm" id="confirmDelete">Delete</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- EDIT MODAL -->
+    <div class="modal-overlay" id="editModal">
+        <div class="modal modal--wide">
+            <h2 class="modal-title">Edit Decision</h2>
+            <div class="edit-form">
+                <div class="edit-row">
+                    <div class="edit-group">
+                        <label>Title</label>
+                        <input type="text" id="editTitle">
+                    </div>
+                    <div class="edit-group">
+                        <label>Date</label>
+                        <input type="date" id="editDate">
+                    </div>
+                </div>
+                <div class="edit-row">
+                    <div class="edit-group">
+                        <label>Category</label>
+                        <select id="editCategory">
+                            <option value="career">Career</option>
+                            <option value="finance">Finance</option>
+                            <option value="health">Health</option>
+                            <option value="personal">Personal</option>
+                            <option value="education">Education</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                    <div class="edit-group">
+                        <label>Outcome</label>
+                        <select id="editOutcome">
+                            <option value="success">Success</option>
+                            <option value="failure">Failure</option>
+                            <option value="ongoing">Still unfolding</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="edit-group">
+                    <label>Note</label>
+                    <textarea id="editNote" rows="4"></textarea>
+                </div>
+                <div class="edit-group">
+                    <label>Tags (comma separated)</label>
+                    <input type="text" id="editTags">
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button class="btn-modal-cancel" id="cancelEdit">Cancel</button>
+                <button class="btn-modal-save" id="saveEdit">Save Changes</button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { auth, db } from './firebase-config.js';
+        import { onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.10.0/firebase-auth.js';
+        import { collection, getDocs, getDoc, query, orderBy, deleteDoc, doc, updateDoc, setDoc, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.10.0/firebase-firestore.js';
+
+        document.getElementById('logoutBtn').addEventListener('click', async (e) => {
+            e.preventDefault();
+            await signOut(auth);
+            window.location.href = 'Login page.html';
+        });
+
+        let currentUser = null;
+        let allDecisions = [];
+
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                currentUser = user;
+                const userDoc = await getDoc(doc(db, 'users', user.uid));
+                let displayName = user.email.split('@')[0];
+                if (userDoc.exists()) {
+                    const data = userDoc.data();
+                    displayName = data.firstName || data.username || displayName;
+                }
+                document.querySelector('.profile-name').textContent = displayName;
+                document.querySelector('.dropdown p').textContent = displayName;
+                document.getElementById('avatarBtn').textContent = displayName.charAt(0).toUpperCase();
+
+                await fetchAndRenderDecisions();
+            } else {
+                window.location.href = 'Login page.html';
+            }
+        });
+
+        async function recalculateStats() {
+            if (!currentUser) return;
+            const stats = {
+                totalDecisions: 0, successes: 0, failures: 0, ongoing: 0,
+                outcomesByCategory: {}, outcomesByRisk: {}
+            };
+            allDecisions.forEach(d => {
+                stats.totalDecisions++;
+                const outcome = d.outcome || 'ongoing';
+                const cat = d.category || 'other';
+                const risk = d.riskLevel;
+
+                let outKey = outcome === 'success' ? 'successes' : (outcome === 'failure' ? 'failures' : 'ongoing');
+                stats[outKey] = (stats[outKey] || 0) + 1;
+
+                if (!stats.outcomesByCategory[cat]) stats.outcomesByCategory[cat] = { success:0, failure:0, ongoing:0 };
+                stats.outcomesByCategory[cat][outcome] = (stats.outcomesByCategory[cat][outcome] || 0) + 1;
+
+                if (risk) {
+                    if (!stats.outcomesByRisk[risk]) stats.outcomesByRisk[risk] = { success:0, failure:0, ongoing:0 };
+                    stats.outcomesByRisk[risk][outcome] = (stats.outcomesByRisk[risk][outcome] || 0) + 1;
+                }
+            });
+            await setDoc(doc(db, 'users', currentUser.uid, 'stats', 'overview'), stats);
+        }
+
+        async function fetchAndRenderDecisions() {
+            const q = query(collection(db, 'users', currentUser.uid, 'decisions'), orderBy('date', 'desc'));
+            const snap = await getDocs(q);
+            allDecisions = [];
+            snap.forEach(d => {
+                allDecisions.push({ id: d.id, ...d.data() });
+            });
+            renderTimeline();
+            applyFilters();
+        }
+
+        const outcomeLabels = { success: 'Success', failure: 'Failure', ongoing: 'Still unfolding' };
+        
+        function renderTimeline() {
+            const container = document.getElementById('timeline');
+            container.innerHTML = '';
+            
+            if (allDecisions.length === 0) {
+                // empty state will be shown by applyFilters
+                return; 
+            }
+
+            const groups = {};
+            allDecisions.forEach(d => {
+                const year = d.date ? d.date.substring(0, 4) : 'Unknown';
+                if (!groups[year]) groups[year] = [];
+                groups[year].push(d);
+            });
+
+            Object.keys(groups).sort((a,b) => b - a).forEach(year => {
+                const yg = document.createElement('div');
+                yg.className = 'year-group';
+                yg.dataset.year = year;
+                yg.innerHTML = `<div class="year-label">${year}</div>`;
+                
+                const yd = document.createElement('div');
+                yd.className = 'year-decisions';
+
+                groups[year].forEach(d => {
+                    const item = document.createElement('div');
+                    item.className = `tl-item ${d.outcome}`;
+                    item.dataset.id = d.id;
+                    item.dataset.title = d.title || '';
+                    item.dataset.category = d.category || '';
+                    item.dataset.outcome = d.outcome || '';
+                    item.dataset.date = d.date || '';
+
+                    const dateObj = new Date((d.date || '2000-01-01') + 'T00:00:00');
+                    const formattedDate = dateObj.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+                    const capCat = d.category ? (d.category.charAt(0).toUpperCase() + d.category.slice(1)) : 'Other';
+
+                    const tagsHtml = (d.tags || []).map(t => `<span class="tl-tag">${t}</span>`).join('');
+                    const noteText = d.situation || d.thoughts || '';
+
+                    item.innerHTML = `
+                        <div class="tl-dot"></div>
+                        <div class="tl-card">
+                            <div class="tl-card-top">
+                                <span class="tl-date">${formattedDate}</span>
+                                <span class="tl-badge">${capCat}</span>
+                                <span class="tl-outcome-pill">${outcomeLabels[d.outcome] || 'Unknown'}</span>
+                                <div class="tl-actions">
+                                    <button class="tl-btn edit-btn" title="Edit">✏️</button>
+                                    <button class="tl-btn delete-btn" title="Delete">🗑️</button>
+                                </div>
+                            </div>
+                            <div class="tl-title">${d.title}</div>
+                            <p class="tl-note">${noteText}</p>
+                            <div class="tl-tags">${tagsHtml}</div>
+                        </div>
+                    `;
+                    yd.appendChild(item);
+                });
+                yg.appendChild(yd);
+                container.appendChild(yg);
+            });
+        }
+
+        /* ── Avatar dropdown ── */
+        const avatar   = document.getElementById('avatarBtn');
+        const dropdown = document.getElementById('dropdown');
+        avatar.addEventListener('click', e => { e.stopPropagation(); dropdown.classList.toggle('open'); });
+        document.addEventListener('click', () => dropdown.classList.remove('open'));
+        dropdown.addEventListener('click', e => e.stopPropagation());
+
+        /* ── Search & Filter ── */
+        const searchInput    = document.getElementById('searchInput');
+        const clearBtn       = document.getElementById('clearBtn');
+        const categoryFilter = document.getElementById('categoryFilter');
+        const outcomeFilter  = document.getElementById('outcomeFilter');
+        const resultsCount   = document.getElementById('resultsCount');
+        const emptyState     = document.getElementById('emptyState');
+        const resetBtn       = document.getElementById('resetBtn');
+
+        function allItems() { return document.querySelectorAll('.tl-item'); }
+        function yearGroups() { return document.querySelectorAll('.year-group'); }
+
+        function applyFilters() {
+            const query    = searchInput.value.toLowerCase().trim();
+            const category = categoryFilter.value.toLowerCase();
+            const outcome  = outcomeFilter.value.toLowerCase();
+
+            clearBtn.style.opacity = query ? '1' : '0';
+            clearBtn.style.pointerEvents = query ? 'auto' : 'none';
+
+            let visible = 0;
+            allItems().forEach(item => {
+                const title = item.dataset.title.toLowerCase();
+                const cat   = item.dataset.category.toLowerCase();
+                const out   = item.dataset.outcome.toLowerCase();
+                const note  = item.querySelector('.tl-note')?.textContent.toLowerCase() || '';
+
+                const show = (!query || title.includes(query) || note.includes(query))
+                          && (!category || cat === category)
+                          && (!outcome  || out === outcome);
+
+                item.style.display = show ? '' : 'none';
+                if (show) visible++;
+            });
+
+            yearGroups().forEach(group => {
+                const anyVisible = [...group.querySelectorAll('.tl-item')].some(i => i.style.display !== 'none');
+                group.style.display = anyVisible ? '' : 'none';
+            });
+
+            resultsCount.textContent = visible === 1 ? 'Showing 1 decision' : `Showing ${visible} decisions`;
+            
+            // Only show empty state if decisions array isn't empty but filters hide everything
+            // If completely empty, show emptyState but resultsCount = 0
+            if (allDecisions.length === 0) {
+                emptyState.style.display = 'flex';
+                resultsCount.textContent = 'Showing 0 decisions';
+            } else {
+                emptyState.style.display = visible === 0 ? 'flex' : 'none';
+            }
+        }
+
+        searchInput.addEventListener('input', applyFilters);
+        categoryFilter.addEventListener('change', applyFilters);
+        outcomeFilter.addEventListener('change', applyFilters);
+        clearBtn.addEventListener('click', () => { searchInput.value = ''; applyFilters(); searchInput.focus(); });
+        resetBtn.addEventListener('click', () => { searchInput.value = ''; categoryFilter.value = ''; outcomeFilter.value = ''; applyFilters(); });
+
+        /* ── DELETE ── */
+        const deleteModal   = document.getElementById('deleteModal');
+        const confirmDelete = document.getElementById('confirmDelete');
+        const cancelDelete  = document.getElementById('cancelDelete');
+        let pendingDeleteId   = null;
+
+        document.getElementById('timeline').addEventListener('click', function(e) {
+            const deleteBtn = e.target.closest('.delete-btn');
+            if (deleteBtn) {
+                pendingDeleteId = deleteBtn.closest('.tl-item').dataset.id;
+                deleteModal.classList.add('open');
+            }
+        });
+
+        confirmDelete.addEventListener('click', async () => {
+            if (pendingDeleteId) {
+                // Delete from Firestore
+                await deleteDoc(doc(db, 'users', currentUser.uid, 'decisions', pendingDeleteId));
+                
+                // Update local array and re-render
+                allDecisions = allDecisions.filter(d => d.id !== pendingDeleteId);
+                
+                await recalculateStats();
+                renderTimeline();
+                applyFilters();
+                pendingDeleteId = null;
+            }
+            deleteModal.classList.remove('open');
+        });
+
+        cancelDelete.addEventListener('click', () => {
+            pendingDeleteId = null;
+            deleteModal.classList.remove('open');
+        });
+
+        deleteModal.addEventListener('click', function(e) {
+            if (e.target === deleteModal) { pendingDeleteId = null; deleteModal.classList.remove('open'); }
+        });
+
+        /* ── EDIT ── */
+        const editModal   = document.getElementById('editModal');
+        const cancelEdit  = document.getElementById('cancelEdit');
+        const saveEdit    = document.getElementById('saveEdit');
+        let editingId     = null;
+
+        document.getElementById('timeline').addEventListener('click', function(e) {
+            const editBtn = e.target.closest('.edit-btn');
+            if (!editBtn) return;
+
+            const item = editBtn.closest('.tl-item');
+            editingId = item.dataset.id;
+            const card  = item.querySelector('.tl-card');
+
+            document.getElementById('editTitle').value    = item.dataset.title;
+            document.getElementById('editDate').value     = item.dataset.date;
+            document.getElementById('editCategory').value = item.dataset.category;
+            document.getElementById('editOutcome').value  = item.dataset.outcome;
+            document.getElementById('editNote').value     = card.querySelector('.tl-note').textContent.trim();
+            document.getElementById('editTags').value     = [...card.querySelectorAll('.tl-tag')].map(t => t.textContent).join(', ');
+
+            editModal.classList.add('open');
+        });
+
+        saveEdit.addEventListener('click', async () => {
+            if (!editingId) return;
+
+            const newTitle    = document.getElementById('editTitle').value.trim();
+            const newDate     = document.getElementById('editDate').value;
+            const newCategory = document.getElementById('editCategory').value;
+            const newOutcome  = document.getElementById('editOutcome').value;
+            const newNote     = document.getElementById('editNote').value.trim();
+            const newTags     = document.getElementById('editTags').value.split(',').map(t => t.trim()).filter(Boolean);
+
+            const updates = {
+                title: newTitle,
+                date: newDate,
+                category: newCategory,
+                outcome: newOutcome,
+                situation: newNote,
+                tags: newTags,
+                updatedAt: serverTimestamp()
+            };
+
+            // Update Firestore
+            await updateDoc(doc(db, 'users', currentUser.uid, 'decisions', editingId), updates);
+
+            // Update local array
+            const dIndex = allDecisions.findIndex(d => d.id === editingId);
+            if (dIndex > -1) {
+                allDecisions[dIndex] = { ...allDecisions[dIndex], ...updates, updatedAt: new Date() };
+            }
+
+            await recalculateStats();
+            renderTimeline();
+            applyFilters();
+
+            editingId = null;
+            editModal.classList.remove('open');
+        });
+
+        cancelEdit.addEventListener('click', () => { editingId = null; editModal.classList.remove('open'); });
+        editModal.addEventListener('click', function(e) {
+            if (e.target === editModal) { editingId = null; editModal.classList.remove('open'); }
+        });
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,677 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Lessons – Decision Graveyard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="lessons theme.css">
+</head>
+<body>
+
+    <!-- HEADER -->
+    <header>
+        <a href="home page.html" class="header-logo">Decision <span>Graveyard</span></a>
+        <div class="profile">
+            <span class="profile-name">Name</span>
+            <div class="avatar" id="avatarBtn">N</div>
+            <div class="dropdown" id="dropdown">
+                <p>Name</p>
+                <hr>
+                <a href="settings.html">Settings</a>
+                <a href="#" id="logoutBtn">Log out</a>
+            </div>
+        </div>
+    </header>
+
+    <div class="body-wrap">
+
+        <!-- SIDEBAR NAV -->
+        <nav>
+            <ul class="links">
+                <li><a href="home page.html">🏠 Home</a></li>
+                <li><a href="Decision_form.html">➕ Add Decision</a></li>
+                <li><a href="Timeline page.html">📅 Timeline</a></li>
+                <li><a href="insights.html">📊 Insights</a></li>
+                <li><a href="lessons.html" class="active">📖 Lessons</a></li>
+            </ul>
+        </nav>
+
+        <!-- MAIN CONTENT -->
+        <main class="main-content">
+
+            <!-- Hero -->
+            <div class="hero">
+                <div class="hero-left">
+                    <h1 class="hero-title">Lessons Learned</h1>
+                    <p class="hero-sub">Distilled wisdom from your decisions. Write rules you actually intend to keep.</p>
+                </div>
+                <button class="btn-primary" id="openWriteBtn">
+                    <span class="btn-icon">✍</span> Write Lesson
+                </button>
+            </div>
+
+            <!-- ── PINNED LESSONS ── -->
+            <section class="pinned-section" id="pinnedSection">
+                <div class="section-header">
+                    <h2 class="section-title">
+                        <span class="pin-icon">📌</span> Pinned Rules
+                    </h2>
+                    <p class="section-desc">Your personal operating principles — kept at the top.</p>
+                </div>
+                <div class="pinned-grid" id="pinnedGrid">
+                    <!-- injected by JS -->
+                </div>
+            </section>
+
+            <!-- ── ALL LESSONS ── -->
+            <section class="all-section">
+                <div class="section-header">
+                    <h2 class="section-title">All Lessons</h2>
+                    <p class="section-desc" id="lessonCount">—</p>
+                </div>
+
+                <!-- Filters row -->
+                <div class="filters-row">
+                    <div class="search-wrap">
+                        <span class="search-icon">🔍</span>
+                        <input type="text" class="search-input" id="searchInput" placeholder="Search lessons…">
+                    </div>
+                    <select class="filter-select" id="tagFilter">
+                        <option value="">All Tags</option>
+                    </select>
+                    <select class="filter-select" id="categoryFilter">
+                        <option value="">All Categories</option>
+                        <option value="Career">Career</option>
+                        <option value="Finance">Finance</option>
+                        <option value="Health">Health</option>
+                        <option value="Personal">Personal</option>
+                        <option value="Education">Education</option>
+                    </select>
+                </div>
+
+                <div class="lessons-list" id="lessonsList">
+                    <!-- injected by JS -->
+                </div>
+
+                <!-- Empty state -->
+                <div class="empty-state" id="emptyState" style="display:none">
+                    <div class="empty-icon">🪦</div>
+                    <div class="empty-title">No lessons found</div>
+                    <div class="empty-body">Try adjusting your filters, or write a new one.</div>
+                    <button class="btn-ghost" id="resetBtn">Reset filters</button>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <!-- ══════════ WRITE / EDIT MODAL ══════════ -->
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal" id="modal">
+            <div class="modal-header">
+                <h2 class="modal-title" id="modalTitle">Write a Lesson</h2>
+                <button class="modal-close" id="modalClose">✕</button>
+            </div>
+
+            <div class="modal-body">
+                <div class="field-group">
+                    <label class="field-label">Title <span class="req">*</span></label>
+                    <input type="text" class="field-input" id="lessonTitle" placeholder="e.g. Never skip the research phase">
+                </div>
+
+                <div class="field-group">
+                    <label class="field-label">Body <span class="req">*</span></label>
+                    <textarea class="field-textarea" id="lessonBody" rows="4" placeholder="What did you learn? What would you tell your past self?"></textarea>
+                </div>
+
+                <div class="field-row">
+                    <div class="field-group" style="flex:1">
+                        <label class="field-label">Linked Decision</label>
+                        <select class="field-input" id="lessonDecision">
+                            <option value="">— none —</option>
+                        </select>
+                    </div>
+                    <div class="field-group" style="flex:1">
+                        <label class="field-label">Category</label>
+                        <select class="field-input" id="lessonCategory">
+                            <option value="">— none —</option>
+                            <option value="Career">Career</option>
+                            <option value="Finance">Finance</option>
+                            <option value="Health">Health</option>
+                            <option value="Personal">Personal</option>
+                            <option value="Education">Education</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="field-group">
+                    <label class="field-label">Tags <span class="field-hint">(comma-separated)</span></label>
+                    <input type="text" class="field-input" id="lessonTags" placeholder="e.g. risk, finance, regret">
+                </div>
+
+                <div class="field-group pin-row">
+                    <label class="toggle-label">
+                        <input type="checkbox" id="lessonPinned" class="toggle-checkbox">
+                        <span class="toggle-track">
+                            <span class="toggle-thumb"></span>
+                        </span>
+                        <span class="toggle-text">Pin as a personal rule</span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button class="btn-ghost" id="cancelBtn">Cancel</button>
+                <button class="btn-primary" id="saveBtn">Save Lesson</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ══════════ DELETE CONFIRM ══════════ -->
+    <div class="modal-overlay" id="deleteOverlay">
+        <div class="modal modal-sm" id="deleteModal">
+            <div class="modal-header">
+                <h2 class="modal-title">Delete Lesson?</h2>
+                <button class="modal-close" id="deleteClose">✕</button>
+            </div>
+            <div class="modal-body">
+                <p class="delete-warn">This lesson will be permanently removed. There's no undo.</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-ghost" id="deleteCancelBtn">Keep it</button>
+                <button class="btn-danger" id="deleteConfirmBtn">Yes, delete</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ════ AI CHATBOT UI ════ -->
+    <button class="chat-fab" id="chatFab">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+        </svg>
+    </button>
+
+    <div class="chat-window" id="chatWindow">
+        <div class="chat-header">
+            <h3>Graveyard AI</h3>
+            <button class="chat-close" id="chatClose">✕</button>
+        </div>
+        <div class="chat-messages" id="chatMessages">
+            <div class="chat-msg ai-msg">
+                <div class="msg-bubble">Hello! I'm your Decision Graveyard AI. Ask me about your past decisions and lessons learned.</div>
+            </div>
+        </div>
+        <div class="chat-input-area">
+            <input type="text" id="chatInput" placeholder="Ask something..." autocomplete="off">
+            <button id="chatSendBtn">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="22" y1="2" x2="11" y2="13"></line>
+                    <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                </svg>
+            </button>
+        </div>
+    </div>
+
+    <script type="module">
+        import { app, auth, db } from './firebase-config.js';
+        import { onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.10.0/firebase-auth.js';
+        import { collection, getDocs, getDoc, doc, setDoc, deleteDoc, updateDoc, addDoc, query, orderBy, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.10.0/firebase-firestore.js';
+
+        document.getElementById('logoutBtn').addEventListener('click', async (e) => {
+            e.preventDefault();
+            await signOut(auth);
+            window.location.href = 'Login page.html';
+        });
+
+        // Avatar dropdown
+        const avatarBtn = document.getElementById('avatarBtn');
+        const dropdown  = document.getElementById('dropdown');
+        avatarBtn.addEventListener('click', e => { e.stopPropagation(); dropdown.classList.toggle('open'); });
+        document.addEventListener('click', () => dropdown.classList.remove('open'));
+        dropdown.addEventListener('click', e => e.stopPropagation());
+
+        let currentUser = null;
+        let lessons = [];
+        let allDecisions = [];
+        let editingId  = null;
+        let deletingId = null;
+
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                currentUser = user;
+                const userDoc = await getDoc(doc(db, 'users', user.uid));
+                let displayName = user.email.split('@')[0];
+                if (userDoc.exists()) {
+                    const data = userDoc.data();
+                    displayName = data.firstName || data.username || displayName;
+                }
+                document.querySelector('.profile-name').textContent = displayName;
+                document.querySelector('.dropdown p').textContent = displayName;
+                document.getElementById('avatarBtn').textContent = displayName.charAt(0).toUpperCase();
+
+                await loadDecisions();
+                await loadLessons();
+            } else {
+                window.location.href = 'Login page.html';
+            }
+        });
+
+        async function loadDecisions() {
+            const q = query(collection(db, 'users', currentUser.uid, 'decisions'), orderBy('date', 'desc'));
+            const snap = await getDocs(q);
+            const select = document.getElementById('lessonDecision');
+            select.innerHTML = '<option value="">— none —</option>';
+            snap.forEach(doc => {
+                const d = doc.data();
+                const opt = document.createElement('option');
+                opt.value = doc.id; // Store document ID
+                opt.textContent = d.title;
+                allDecisions.push({ id: doc.id, title: d.title });
+                select.appendChild(opt);
+            });
+        }
+
+        async function loadLessons() {
+            const q = query(collection(db, 'users', currentUser.uid, 'lessons'), orderBy('createdAt', 'desc'));
+            const snap = await getDocs(q);
+            lessons = [];
+            snap.forEach(doc => {
+                lessons.push({ id: doc.id, ...doc.data() });
+            });
+            render();
+        }
+
+        /* ── Helpers ── */
+        const formatDate = iso => {
+            if (!iso) return '';
+            const d = new Date(iso);
+            return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+        };
+
+        /* ── Populate tag filter ── */
+        function rebuildTagFilter() {
+            const tagSet = new Set();
+            lessons.forEach(l => (l.tags||[]).forEach(t => tagSet.add(t)));
+            const sel = document.getElementById('tagFilter');
+            const cur = sel.value;
+            sel.innerHTML = '<option value="">All Tags</option>';
+            [...tagSet].sort().forEach(t => {
+                const o = document.createElement('option');
+                o.value = t; o.textContent = t;
+                if (t === cur) o.selected = true;
+                sel.appendChild(o);
+            });
+        }
+
+        /* ── Render ── */
+        function render() {
+            const q    = document.getElementById('searchInput').value.toLowerCase();
+            const tag  = document.getElementById('tagFilter').value;
+            const cat  = document.getElementById('categoryFilter').value;
+
+            const pinned = lessons.filter(l => l.pinned);
+            const pinnedSection = document.getElementById('pinnedSection');
+            const pinnedGrid    = document.getElementById('pinnedGrid');
+
+            pinnedSection.style.display = pinned.length ? 'block' : 'none';
+            pinnedGrid.innerHTML = '';
+            pinned.forEach(l => pinnedGrid.appendChild(makePinnedCard(l)));
+
+            const all = lessons.filter(l => {
+                const matchQ   = !q || (l.title||'').toLowerCase().includes(q) || (l.body||'').toLowerCase().includes(q);
+                const matchTag = !tag || (l.tags||[]).includes(tag);
+                const matchCat = !cat || l.category === cat;
+                return matchQ && matchTag && matchCat;
+            });
+
+            const list  = document.getElementById('lessonsList');
+            const empty = document.getElementById('emptyState');
+            const count = document.getElementById('lessonCount');
+
+            list.innerHTML = '';
+            if (all.length === 0) {
+                empty.style.display = 'flex';
+                list.style.display  = 'none';
+                count.textContent   = '0 lessons';
+            } else {
+                empty.style.display = 'none';
+                list.style.display  = 'flex';
+                count.textContent   = `${all.length} lesson${all.length !== 1 ? 's' : ''}`;
+                all.forEach((l, i) => {
+                    const card = makeLessonCard(l);
+                    card.style.animationDelay = `${i * 0.04}s`;
+                    list.appendChild(card);
+                });
+            }
+
+            rebuildTagFilter();
+        }
+
+        /* ── Pinned card ── */
+        function makePinnedCard(l) {
+            const card = document.createElement('div');
+            card.className = 'pinned-card';
+            const tagsHtml = (l.tags||[]).map(t => `<span class="meta-tag">${t}</span>`).join('');
+            card.innerHTML = `
+                <div class="pinned-title">${l.title}</div>
+                <div class="pinned-body">${l.body}</div>
+                <div class="pinned-meta">
+                    ${l.category ? `<span class="meta-tag cat-tag">${l.category}</span>` : ''}
+                    ${tagsHtml}
+                </div>
+                <div class="pinned-actions">
+                    <button class="act-btn" data-id="${l.id}" data-action="edit">Edit</button>
+                    <button class="act-btn act-unpin" data-id="${l.id}" data-action="unpin">Unpin</button>
+                </div>
+            `;
+            return card;
+        }
+
+        /* ── Lesson card ── */
+        function makeLessonCard(l) {
+            const card = document.createElement('div');
+            card.className = 'lesson-card fade-in';
+            const tagsHtml = (l.tags||[]).map(t => `<span class="meta-tag">${t}</span>`).join('');
+            
+            let linkedDecisionTitle = '';
+            if (l.decisionId) {
+                const dec = allDecisions.find(d => d.id === l.decisionId);
+                if (dec) linkedDecisionTitle = dec.title;
+            }
+
+            card.innerHTML = `
+                <div class="lc-top">
+                    <div class="lc-title-row">
+                        <span class="lc-title">${l.title}</span>
+                        ${l.pinned ? '<span class="lc-pin-badge">📌 pinned</span>' : ''}
+                    </div>
+                    <div class="lc-actions">
+                        <button class="icon-btn" data-id="${l.id}" data-action="pin" title="${l.pinned ? 'Unpin' : 'Pin'}">
+                            ${l.pinned ? '📌' : '📍'}
+                        </button>
+                        <button class="icon-btn" data-id="${l.id}" data-action="edit" title="Edit">✏️</button>
+                        <button class="icon-btn icon-btn-del" data-id="${l.id}" data-action="delete" title="Delete">🗑</button>
+                    </div>
+                </div>
+                <div class="lc-body">${l.body}</div>
+                <div class="lc-footer">
+                    <div class="lc-meta">
+                        ${l.category ? `<span class="meta-tag cat-tag">${l.category}</span>` : ''}
+                        ${tagsHtml}
+                        ${linkedDecisionTitle ? `<span class="lc-linked">🔗 ${linkedDecisionTitle}</span>` : ''}
+                    </div>
+                    <span class="lc-date">${formatDate(l.date || l.createdAt)}</span>
+                </div>
+            `;
+            return card;
+        }
+
+        /* ── Delegated click for cards ── */
+        document.addEventListener('click', async e => {
+            const btn = e.target.closest('[data-action]');
+            if (!btn) return;
+            const id     = btn.dataset.id; // id is string in Firestore
+            const action = btn.dataset.action;
+
+            if (action === 'edit') openEdit(id);
+            if (action === 'delete') openDelete(id);
+            if (action === 'pin' || action === 'unpin') {
+                const l = lessons.find(x => x.id === id);
+                if (l) {
+                    l.pinned = !l.pinned;
+                    render();
+                    await updateDoc(doc(db, 'users', currentUser.uid, 'lessons', id), { pinned: l.pinned });
+                }
+            }
+        });
+
+        /* ── Filters ── */
+        document.getElementById('searchInput').addEventListener('input', render);
+        document.getElementById('tagFilter').addEventListener('change', render);
+        document.getElementById('categoryFilter').addEventListener('change', render);
+        document.getElementById('resetBtn').addEventListener('click', () => {
+            document.getElementById('searchInput').value = '';
+            document.getElementById('tagFilter').value   = '';
+            document.getElementById('categoryFilter').value = '';
+            render();
+        });
+
+        /* ════ MODAL ════ */
+        const modalOverlay = document.getElementById('modalOverlay');
+        const modal        = document.getElementById('modal');
+
+        function openWrite() {
+            editingId = null;
+            document.getElementById('modalTitle').textContent = 'Write a Lesson';
+            clearForm();
+            modalOverlay.classList.add('open');
+            document.getElementById('lessonTitle').focus();
+        }
+
+        function openEdit(id) {
+            const l = lessons.find(x => x.id === id);
+            if (!l) return;
+            editingId = id;
+            document.getElementById('modalTitle').textContent = 'Edit Lesson';
+            document.getElementById('lessonTitle').value    = l.title || '';
+            document.getElementById('lessonBody').value     = l.body || '';
+            document.getElementById('lessonDecision').value = l.decisionId || '';
+            document.getElementById('lessonCategory').value = l.category || '';
+            document.getElementById('lessonTags').value     = (l.tags||[]).join(', ');
+            document.getElementById('lessonPinned').checked = l.pinned || false;
+            modalOverlay.classList.add('open');
+            document.getElementById('lessonTitle').focus();
+        }
+
+        function closeModal() {
+            modalOverlay.classList.remove('open');
+            clearForm();
+            editingId = null;
+        }
+
+        function clearForm() {
+            ['lessonTitle','lessonBody','lessonTags'].forEach(id => document.getElementById(id).value = '');
+            document.getElementById('lessonDecision').value = '';
+            document.getElementById('lessonCategory').value = '';
+            document.getElementById('lessonPinned').checked = false;
+        }
+
+        document.getElementById('openWriteBtn').addEventListener('click', openWrite);
+        document.getElementById('modalClose').addEventListener('click', closeModal);
+        document.getElementById('cancelBtn').addEventListener('click', closeModal);
+        modalOverlay.addEventListener('click', e => { if (e.target === modalOverlay) closeModal(); });
+
+        document.getElementById('saveBtn').addEventListener('click', async (e) => {
+            const title = document.getElementById('lessonTitle').value.trim();
+            const body  = document.getElementById('lessonBody').value.trim();
+            if (!title || !body) {
+                ['lessonTitle','lessonBody'].forEach(id => {
+                    const el = document.getElementById(id);
+                    if (!el.value.trim()) el.classList.add('field-error');
+                });
+                return;
+            }
+            document.querySelectorAll('.field-error').forEach(el => el.classList.remove('field-error'));
+
+            const tags = document.getElementById('lessonTags').value
+                .split(',').map(t => t.trim().toLowerCase()).filter(Boolean);
+
+            const btn = e.target;
+            const orig = btn.textContent;
+            btn.textContent = 'Saving...';
+            btn.disabled = true;
+
+            const lessonData = {
+                title,
+                body,
+                decisionId: document.getElementById('lessonDecision').value,
+                category: document.getElementById('lessonCategory').value,
+                tags,
+                pinned: document.getElementById('lessonPinned').checked,
+            };
+
+            try {
+                if (editingId !== null) {
+                    lessonData.updatedAt = serverTimestamp();
+                    await updateDoc(doc(db, 'users', currentUser.uid, 'lessons', editingId), lessonData);
+                    const l = lessons.find(x => x.id === editingId);
+                    Object.assign(l, lessonData);
+                } else {
+                    lessonData.createdAt = serverTimestamp();
+                    lessonData.date = new Date().toISOString(); // storing date as fallback
+                    const docRef = await addDoc(collection(db, 'users', currentUser.uid, 'lessons'), lessonData);
+                    lessons.unshift({ id: docRef.id, ...lessonData });
+                }
+                closeModal();
+                render();
+            } catch (err) {
+                console.error(err);
+                alert("Error saving lesson");
+            } finally {
+                btn.textContent = orig;
+                btn.disabled = false;
+            }
+        });
+
+        /* Clear error highlight on input */
+        ['lessonTitle','lessonBody'].forEach(id => {
+            document.getElementById(id).addEventListener('input', function() {
+                this.classList.remove('field-error');
+            });
+        });
+
+        /* ════ DELETE MODAL ════ */
+        const deleteOverlay = document.getElementById('deleteOverlay');
+
+        function openDelete(id) {
+            deletingId = id;
+            deleteOverlay.classList.add('open');
+        }
+        function closeDelete() {
+            deleteOverlay.classList.remove('open');
+            deletingId = null;
+        }
+
+        document.getElementById('deleteClose').addEventListener('click', closeDelete);
+        document.getElementById('deleteCancelBtn').addEventListener('click', closeDelete);
+        deleteOverlay.addEventListener('click', e => { if (e.target === deleteOverlay) closeDelete(); });
+        document.getElementById('deleteConfirmBtn').addEventListener('click', async (e) => {
+            if (!deletingId) return;
+            const btn = e.target;
+            const orig = btn.textContent;
+            btn.textContent = 'Deleting...';
+            try {
+                await deleteDoc(doc(db, 'users', currentUser.uid, 'lessons', deletingId));
+                lessons = lessons.filter(l => l.id !== deletingId);
+                closeDelete();
+                render();
+            } catch (err) {
+                console.error(err);
+                alert("Error deleting lesson");
+            } finally {
+                btn.textContent = orig;
+            }
+        });
+
+        /* ════ AI CHATBOT LOGIC ════ */
+        const chatFab = document.getElementById('chatFab');
+        const chatWindow = document.getElementById('chatWindow');
+        const chatClose = document.getElementById('chatClose');
+        const chatMessages = document.getElementById('chatMessages');
+        const chatInput = document.getElementById('chatInput');
+        const chatSendBtn = document.getElementById('chatSendBtn');
+
+        chatFab.addEventListener('click', () => {
+            chatWindow.classList.add('open');
+            chatInput.focus();
+            chatFab.style.display = 'none';
+        });
+
+        chatClose.addEventListener('click', () => {
+            chatWindow.classList.remove('open');
+            setTimeout(() => { chatFab.style.display = 'flex'; }, 300);
+        });
+
+        function addMessage(text, sender) {
+            const wrapper = document.createElement('div');
+            wrapper.className = `chat-msg ${sender}-msg`;
+            const bubble = document.createElement('div');
+            bubble.className = 'msg-bubble';
+            // Simple markdown parsing for bold text
+            bubble.innerHTML = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>');
+            wrapper.appendChild(bubble);
+            chatMessages.appendChild(wrapper);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+            return wrapper;
+        }
+
+        async function sendMessage() {
+            const text = chatInput.value.trim();
+            if (!text) return;
+
+            // User message
+            addMessage(text, 'user');
+            chatInput.value = '';
+            
+            // Loading indicator
+            const loadingMsg = addMessage("Thinking...", 'ai');
+            loadingMsg.classList.add('loading');
+
+            try {
+                // Construct context locally
+                let contextText = "USER'S PAST DECISIONS:\n";
+                if (allDecisions.length === 0) {
+                    contextText += "(No decisions logged yet)\n";
+                } else {
+                    allDecisions.slice(0, 20).forEach(d => {
+                        contextText += `- Decision: ${d.title}\n  Category: ${d.category}\n  Outcome: ${d.outcome}\n  Reflection: ${d.reflection || 'None'}\n\n`;
+                    });
+                }
+
+                contextText += "USER'S LESSONS LEARNED:\n";
+                if (lessons.length === 0) {
+                    contextText += "(No lessons logged yet)\n";
+                } else {
+                    lessons.slice(0, 20).forEach(l => {
+                        contextText += `- ${l.title}: ${l.content}\n`;
+                    });
+                }
+
+                // Get ID token for verification
+                const token = await currentUser.getIdToken();
+
+                const response = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                        message: text,
+                        contextText: contextText
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error("Failed to reach API");
+                }
+
+                const result = await response.json();
+                chatMessages.removeChild(loadingMsg);
+                addMessage(result.reply, 'ai');
+            } catch (error) {
+                console.error("AI Error:", error);
+                chatMessages.removeChild(loadingMsg);
+                addMessage("Sorry, I encountered an error. Please ensure the backend is deployed.", 'ai');
+            }
+        }
+
+        chatSendBtn.addEventListener('click', sendMessage);
+        chatInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') sendMessage();
+        });
+
+    </script>
+</body>
+</html>

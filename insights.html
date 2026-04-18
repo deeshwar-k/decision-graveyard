@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Insights – Decision Graveyard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600&family=DM+Sans:wght@400;500;600&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="insights theme.css">
+</head>
+
+<body>
+
+    <!-- HEADER -->
+    <header>
+        <a href="home page.html" class="header-logo">Decision <span>Graveyard</span></a>
+        <div class="profile">
+            <span class="profile-name">Name</span>
+            <div class="avatar" id="avatarBtn">N</div>
+            <div class="dropdown" id="dropdown">
+                <p>Name</p>
+                <hr>
+                <a href="settings.html">Settings</a>
+                <a href="#" id="logoutBtn">Log out</a>
+            </div>
+        </div>
+    </header>
+
+    <div class="body-wrap">
+
+        <!-- SIDEBAR NAV -->
+        <nav>
+            <ul class="links">
+                <li><a href="home page.html">🏠 Home</a></li>
+                <li><a href="Decision_form.html">➕ Add Decision</a></li>
+                <li><a href="Timeline page.html">📅 Timeline</a></li>
+                <li><a href="insights.html" class="active">📊 Insights</a></li>
+                <li><a href="lessons.html">📖 Lessons</a></li>
+            </ul>
+        </nav>
+
+        <!-- MAIN CONTENT -->
+        <main class="main-content">
+
+            <!-- Hero -->
+            <div class="hero">
+                <h1 class="hero-title">Insights</h1>
+                <p class="hero-sub">Patterns buried in your past. Read-only reflections generated from your logged
+                    decisions.</p>
+            </div>
+
+            <!-- ── SECTION 1: Success vs Failure ── -->
+            <section class="insight-section">
+                <div class="section-header">
+                    <h2 class="section-title">Success vs Failure</h2>
+                    <p class="section-desc">Overall outcome rate across all 24 logged decisions.</p>
+                </div>
+
+                <!-- Overall rate pills -->
+                <div class="rate-row">
+                    <div class="rate-pill success-pill">
+                        <span class="rate-value">17</span>
+                        <span class="rate-label">Successes</span>
+                    </div>
+                    <div class="rate-pill failure-pill">
+                        <span class="rate-value">5</span>
+                        <span class="rate-label">Failures</span>
+                    </div>
+                    <div class="rate-pill ongoing-pill">
+                        <span class="rate-value">2</span>
+                        <span class="rate-label">Still unfolding</span>
+                    </div>
+                    <div class="rate-pill neutral-pill">
+                        <span class="rate-value">71%</span>
+                        <span class="rate-label">Success rate</span>
+                    </div>
+                </div>
+
+                <!-- Bar chart by category -->
+                <div class="chart-card">
+                    <div class="chart-label-row">
+                        <span class="chart-title">Outcomes by Category</span>
+                        <div class="chart-legend">
+                            <span class="legend-dot success-dot"></span><span>Success</span>
+                            <span class="legend-dot failure-dot"></span><span>Failure</span>
+                            <span class="legend-dot ongoing-dot"></span><span>Still unfolding</span>
+                        </div>
+                    </div>
+
+                    <div class="bar-chart" id="barChart">
+                        <!-- rows injected by JS -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- ── SECTION 2: Risk Analysis ── -->
+            <section class="insight-section">
+                <div class="section-header">
+                    <h2 class="section-title">Risk Analysis</h2>
+                    <p class="section-desc">How the risk level you assigned each decision correlates with its eventual
+                        outcome.</p>
+                </div>
+
+                <!-- Risk × outcome matrix -->
+                <div class="chart-card">
+                    <div class="chart-label-row">
+                        <span class="chart-title">Risk Level vs Outcome</span>
+                    </div>
+                    <div class="risk-grid" id="riskGrid">
+                        <!-- injected by JS -->
+                    </div>
+                </div>
+
+                <!-- Takeaway callouts -->
+                <div class="callouts" id="callouts">
+                    <!-- injected by JS -->
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <script type="module">
+        import { auth, db } from './firebase-config.js';
+        import { onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.10.0/firebase-auth.js';
+        import { doc, getDoc } from 'https://www.gstatic.com/firebasejs/10.10.0/firebase-firestore.js';
+
+        document.getElementById('logoutBtn').addEventListener('click', async (e) => {
+            e.preventDefault();
+            await signOut(auth);
+            window.location.href = 'Login page.html';
+        });
+
+        /* ── Avatar dropdown ── */
+        const avatar = document.getElementById('avatarBtn');
+        const dropdown = document.getElementById('dropdown');
+        avatar.addEventListener('click', e => { e.stopPropagation(); dropdown.classList.toggle('open'); });
+        document.addEventListener('click', () => dropdown.classList.remove('open'));
+        dropdown.addEventListener('click', e => e.stopPropagation());
+
+        let currentUser = null;
+
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                currentUser = user;
+                const userDoc = await getDoc(doc(db, 'users', user.uid));
+                let displayName = user.email.split('@')[0];
+                if (userDoc.exists()) {
+                    const data = userDoc.data();
+                    displayName = data.firstName || data.username || displayName;
+                }
+                document.querySelector('.profile-name').textContent = displayName;
+                document.querySelector('.dropdown p').textContent = displayName;
+                document.getElementById('avatarBtn').textContent = displayName.charAt(0).toUpperCase();
+
+                await loadInsights();
+            } else {
+                window.location.href = 'Login page.html';
+            }
+        });
+
+        async function loadInsights() {
+            const statsSnap = await getDoc(doc(db, 'users', currentUser.uid, 'stats', 'overview'));
+            let stats = {
+                totalDecisions: 0, successes: 0, failures: 0, ongoing: 0,
+                outcomesByCategory: {}, outcomesByRisk: {}
+            };
+
+            if (statsSnap.exists()) {
+                stats = { ...stats, ...statsSnap.data() };
+            }
+
+            document.querySelector('.section-desc').textContent = `Overall outcome rate across all ${stats.totalDecisions} logged decisions.`;
+
+            // Success vs Failure Row
+            const sPill = document.querySelector('.success-pill .rate-value');
+            const fPill = document.querySelector('.failure-pill .rate-value');
+            const oPill = document.querySelector('.ongoing-pill .rate-value');
+            const rPill = document.querySelector('.neutral-pill .rate-value');
+
+            sPill.textContent = stats.successes;
+            fPill.textContent = stats.failures;
+            oPill.textContent = stats.ongoing;
+
+            let rate = 0;
+            if (stats.successes + stats.failures > 0) {
+                rate = Math.round((stats.successes / (stats.successes + stats.failures)) * 100);
+            }
+            rPill.textContent = rate + '%';
+
+            // Bar Chart
+            const barChart = document.getElementById('barChart');
+            barChart.innerHTML = '';
+
+            const categories = Object.keys(stats.outcomesByCategory).map(c => {
+                return { name: c.charAt(0).toUpperCase() + c.slice(1), ...stats.outcomesByCategory[c] };
+            });
+
+            if (categories.length === 0) {
+                barChart.innerHTML = '<p style="color:var(--text-muted); padding:20px 0;">No category data yet.</p>';
+            } else {
+                const allTotals = categories.map(c => (c.success || 0) + (c.failure || 0) + (c.ongoing || 0));
+                const maxTotal = Math.max(...allTotals);
+
+                categories.forEach(cat => {
+                    const s = cat.success || 0;
+                    const f = cat.failure || 0;
+                    const o = cat.ongoing || 0;
+                    const total = s + f + o;
+                    const barFill = total > 0 ? (total / maxTotal * 100).toFixed(1) : 0;
+
+                    const row = document.createElement('div');
+                    row.className = 'bar-row';
+                    row.innerHTML = `
+                        <span class="bar-category">${cat.name}</span>
+                        <div class="bar-track">
+                            <div class="bar-fill-wrap" style="width:${barFill}%">
+                                <div class="bar-seg seg-success" style="flex:${s}" title="Success: ${s}"></div>
+                                <div class="bar-seg seg-failure" style="flex:${f}" title="Failure: ${f}"></div>
+                                <div class="bar-seg seg-ongoing" style="flex:${o}" title="Ongoing: ${o}"></div>
+                            </div>
+                        </div>
+                        <div class="bar-stats">
+                            <span class="bs success-text">${s}✓</span>
+                            <span class="bs failure-text">${f}✗</span>
+                            <span class="bs ongoing-text">${o}~</span>
+                        </div>
+                    `;
+                    barChart.appendChild(row);
+                });
+                setTimeout(() => {
+                    document.querySelectorAll('.bar-fill-wrap').forEach((el, i) => {
+                        el.style.transition = `width 0.6s ease ${i * 0.1}s`;
+                        const target = el.style.width;
+                        el.style.width = '0%';
+                        requestAnimationFrame(() => requestAnimationFrame(() => el.style.width = target));
+                    });
+                }, 100);
+            }
+
+            // Risk Grid
+            const riskGrid = document.getElementById('riskGrid');
+            riskGrid.innerHTML = '';
+            const header = document.createElement('div');
+            header.className = 'rg-header';
+            header.innerHTML = `
+                <div class="rg-cell rg-label-cell"></div>
+                <div class="rg-cell rg-head success-head">✓ Success</div>
+                <div class="rg-cell rg-head failure-head">✗ Failure</div>
+                <div class="rg-cell rg-head ongoing-head">~ Still unfolding</div>
+                <div class="rg-cell rg-head rate-head">Rate</div>
+            `;
+            riskGrid.appendChild(header);
+
+            const risks = ['low', 'medium', 'high'];
+            let hasRiskData = false;
+
+            risks.forEach(r => {
+                const data = stats.outcomesByRisk[r];
+                if (data) {
+                    hasRiskData = true;
+                    const s = data.success || 0;
+                    const f = data.failure || 0;
+                    const o = data.ongoing || 0;
+                    const total = s + f + o;
+                    const rRate = (s + f > 0) ? Math.round((s / (s + f)) * 100) : 0;
+                    const rateClass = rRate >= 70 ? 'rate-good' : rRate >= 40 ? 'rate-mid' : 'rate-bad';
+
+                    const row = document.createElement('div');
+                    row.className = 'rg-row';
+                    row.innerHTML = `
+                        <div class="rg-cell rg-risk-label">${r.charAt(0).toUpperCase() + r.slice(1)} Risk</div>
+                        <div class="rg-cell rg-val success-val">${s}</div>
+                        <div class="rg-cell rg-val failure-val">${f}</div>
+                        <div class="rg-cell rg-val ongoing-val">${o}</div>
+                        <div class="rg-cell rg-rate ${rateClass}">${rRate}%</div>
+                    `;
+                    riskGrid.appendChild(row);
+                }
+            });
+
+            if (!hasRiskData) {
+                const row = document.createElement('div');
+                row.className = 'rg-row';
+                row.innerHTML = `<div class="rg-cell" style="grid-column: 1 / -1; text-align: center; color: var(--text-muted); padding: 20px;">No risk data available yet.</div>`;
+                riskGrid.appendChild(row);
+            }
+
+            // Callouts
+            const callouts = document.getElementById('callouts');
+            callouts.innerHTML = '';
+            if (stats.totalDecisions > 0) {
+                const insightsList = [
+                    { icon: '📊', title: 'Data Logged', body: `You have logged ${stats.totalDecisions} decisions.` }
+                ];
+                
+                if (stats.successes > stats.failures) {
+                    insightsList.push({ icon: '📈', title: 'Winning Streak', body: 'You have more successes than failures. Keep up the good work.' });
+                } else if (stats.failures > 0) {
+                    insightsList.push({ icon: '⚠️', title: 'Learning Phase', body: 'Failures are lessons in disguise. Time to reflect on what went wrong.' });
+                }
+
+                insightsList.forEach(ins => {
+                    const card = document.createElement('div');
+                    card.className = 'callout-card';
+                    card.innerHTML = `
+                    <span class="callout-icon">${ins.icon}</span>
+                    <div>
+                        <div class="callout-title">${ins.title}</div>
+                        <div class="callout-body">${ins.body}</div>
+                    </div>
+                    `;
+                    callouts.appendChild(card);
+                });
+            }
+        }
+    </script>
+</body>
+
+</html>
