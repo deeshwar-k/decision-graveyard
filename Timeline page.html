@@ -37,7 +37,7 @@
             </ul>
         </nav>
 
-        <main class="main-content">
+        <main class="main-content" id="mainContent" style="opacity:0; transition: opacity 0.25s ease;">
 
             <div class="hero">
                 <h1 class="hero-title">Timeline</h1>
@@ -267,6 +267,7 @@
                 document.getElementById('avatarBtn').textContent = displayName.charAt(0).toUpperCase();
 
                 await fetchAndRenderDecisions();
+                document.getElementById('mainContent').style.opacity = '1';
             } else {
                 window.location.href = 'Login page.html';
             }
