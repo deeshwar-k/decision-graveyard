@@ -425,11 +425,13 @@ nav {
 
 .chat-window {
     position: fixed; bottom: 28px; right: 28px;
-    width: 360px; height: 520px;
+    width: 360px;
+    height: 520px;
+    max-height: calc(100vh - 120px); /* never overlap header (60px) + breathing room */
     background: var(--bg-card); border: 1px solid var(--border);
     border-radius: 16px; box-shadow: 0 8px 32px rgba(0,0,0,0.5);
     display: flex; flex-direction: column;
-    z-index: 101;
+    z-index: 101; /* below fixed header (200) */
     transform: translateY(20px) scale(0.95);
     opacity: 0; pointer-events: none;
     transition: transform 0.3s ease, opacity 0.3s ease;
@@ -497,6 +499,16 @@ nav {
 }
 #chatSendBtn svg { width: 16px; height: 16px; transform: translateX(-1px); }
 #chatSendBtn:hover { background: #6d28d9; }
+
+/* Rate notice styling */
+.chat-rate-notice {
+    font-size: 11px;
+    padding: 6px 12px;
+    border-top: 1px solid var(--border);
+    background: var(--bg-surface);
+}
+.chat-rate-notice.rate-warn { color: var(--ongoing); }
+.chat-rate-notice.rate-error { color: var(--failure); background: var(--failure-bg); }
 
 /* ════ RESPONSIVE ════ */
 @media (max-width: 768px) {
@@ -567,4 +579,4 @@ nav {
     .lc-top { flex-direction: column; }
     .lc-actions { align-self: flex-end; }
     .field-row { flex-direction: column; }
-}
+}
