@@ -42,7 +42,7 @@
         </nav>
 
         <!-- MAIN CONTENT -->
-        <main class="main-content">
+        <main class="main-content" id="mainContent" style="opacity:0; transition: opacity 0.25s ease;">
 
             <!-- Hero -->
             <div class="hero">
@@ -156,6 +156,7 @@
                 document.getElementById('avatarBtn').textContent = displayName.charAt(0).toUpperCase();
 
                 await loadInsights();
+                document.getElementById('mainContent').style.opacity = '1';
             } else {
                 window.location.href = 'Login page.html';
             }
