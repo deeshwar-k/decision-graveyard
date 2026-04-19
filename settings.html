@@ -75,13 +75,13 @@
                             </div>
                         </div>
                         <div class="field-group">
-                            <label for="email">Email address</label>
-                            <input type="email" id="email" placeholder="you@example.com">
+                            <label for="username">Username</label>
+                            <input type="text" id="username" placeholder="e.g. john_doe">
+                            <span class="field-hint">This is how your name appears across the app.</span>
                         </div>
                         <div class="field-group">
-                            <label for="bio">Bio</label>
-                            <textarea id="bio" placeholder="Tell yourself something about yourself…"></textarea>
-                            <span class="field-hint">Only visible to you.</span>
+                            <label for="email">Email address</label>
+                            <input type="email" id="email" placeholder="you@example.com">
                         </div>
                         <div class="card-footer">
                             <button class="btn btn-ghost">Discard</button>
@@ -168,8 +168,8 @@
                     const data = userDoc.data();
                     document.getElementById('firstName').value = data.firstName || '';
                     document.getElementById('lastName').value = data.lastName || '';
+                    document.getElementById('username').value = data.username || '';
                     document.getElementById('email').value = data.email || currentUser.email;
-                    document.getElementById('bio').value = data.bio || '';
 
                     let displayName = data.username || data.firstName || currentUser.email.split('@')[0];
                     document.querySelector('.profile-name').textContent = displayName;
@@ -190,8 +190,8 @@
                     await updateDoc(doc(db, 'users', currentUser.uid), {
                         firstName: document.getElementById('firstName').value.trim(),
                         lastName: document.getElementById('lastName').value.trim(),
+                        username: document.getElementById('username').value.trim(),
                         email: document.getElementById('email').value.trim(),
-                        bio: document.getElementById('bio').value.trim(),
                     });
                     btn.textContent = 'Saved!';
                     setTimeout(() => btn.textContent = orig, 2000);
