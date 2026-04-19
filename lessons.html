@@ -202,6 +202,7 @@
                 <div class="msg-bubble">Hello! I'm your Decision Graveyard AI. Ask me about your past decisions and lessons learned.</div>
             </div>
         </div>
+        <div id="chatRateNotice"></div>
         <div class="chat-input-area">
             <input type="text" id="chatInput" placeholder="Ask something..." autocomplete="off">
             <button id="chatSendBtn">
@@ -606,39 +607,101 @@
             return wrapper;
         }
 
+        /* ════ RATE LIMITING ════ */
+        const DAILY_LIMIT = 20;
+        const WARN_AT = 5; // show warning when this many prompts remain
+        const WINDOW_MS = 24 * 60 * 60 * 1000; // 24 hours
+
+        const rateNotice = document.getElementById('chatRateNotice');
+
+        function formatTimeLeft(resetTimestamp) {
+            const diff = resetTimestamp - Date.now();
+            if (diff <= 0) return 'shortly';
+            const h = Math.floor(diff / 3600000);
+            const m = Math.floor((diff % 3600000) / 60000);
+            if (h > 0) return `in ${h}h ${m}m`;
+            return `in ${m} minute${m !== 1 ? 's' : ''}`;
+        }
+
+        function showRateNotice(type, msg) {
+            rateNotice.textContent = msg;
+            rateNotice.className = `chat-rate-notice ${type}`;
+        }
+
+        function hideRateNotice() {
+            rateNotice.textContent = '';
+            rateNotice.className = '';
+        }
+
+        async function getUsage() {
+            const userRef = doc(db, 'users', currentUser.uid);
+            const snap = await getDoc(userRef);
+            const data = snap.exists() ? snap.data() : {};
+            const usage = data.aiUsage || { count: 0, windowStart: Date.now() };
+            // Reset if window has expired
+            if (Date.now() - usage.windowStart > WINDOW_MS) {
+                usage.count = 0;
+                usage.windowStart = Date.now();
+            }
+            return usage;
+        }
+
+        async function incrementUsage(usage) {
+            const userRef = doc(db, 'users', currentUser.uid);
+            await updateDoc(userRef, {
+                aiUsage: { count: usage.count + 1, windowStart: usage.windowStart }
+            });
+        }
+
         async function sendMessage() {
             const text = chatInput.value.trim();
             if (!text) return;
 
+            // ── Check rate limit BEFORE sending ──
+            const usage = await getUsage();
+            const remaining = DAILY_LIMIT - usage.count;
+            const resetTime = usage.windowStart + WINDOW_MS;
+
+            if (remaining <= 0) {
+                showRateNotice('rate-error',
+                    `🚫 Daily limit reached. Resets ${formatTimeLeft(resetTime)}.`);
+                return;
+            }
+
+            if (remaining <= WARN_AT) {
+                showRateNotice('rate-warn',
+                    `⚠️ ${remaining} prompt${remaining !== 1 ? 's' : ''} remaining today.`);
+            } else {
+                hideRateNotice();
+            }
+
             // User message
             addMessage(text, 'user');
             chatInput.value = '';
-            
+
             // Loading indicator
-            const loadingMsg = addMessage("Thinking...", 'ai');
+            const loadingMsg = addMessage('Thinking...', 'ai');
             loadingMsg.classList.add('loading');
 
             try {
                 // Construct context locally
                 let contextText = "USER'S PAST DECISIONS:\n";
                 if (allDecisions.length === 0) {
-                    contextText += "(No decisions logged yet)\n";
+                    contextText += '(No decisions logged yet)\n';
                 } else {
                     allDecisions.slice(0, 20).forEach(d => {
                         contextText += `- Decision: ${d.title}\n  Category: ${d.category}\n  Outcome: ${d.outcome}\n  Reflection: ${d.reflection || 'None'}\n\n`;
                     });
                 }
-
                 contextText += "USER'S LESSONS LEARNED:\n";
                 if (lessons.length === 0) {
-                    contextText += "(No lessons logged yet)\n";
+                    contextText += '(No lessons logged yet)\n';
                 } else {
                     lessons.slice(0, 20).forEach(l => {
                         contextText += `- ${l.title}: ${l.content}\n`;
                     });
                 }
 
-                // Get ID token for verification
                 const token = await currentUser.getIdToken();
 
                 const response = await fetch('/api/chat', {
@@ -647,23 +710,37 @@
                         'Content-Type': 'application/json',
                         'Authorization': `Bearer ${token}`
                     },
-                    body: JSON.stringify({
-                        message: text,
-                        contextText: contextText
-                    })
+                    body: JSON.stringify({ message: text, contextText })
                 });
 
                 if (!response.ok) {
-                    throw new Error("Failed to reach API");
+                    const errData = await response.json().catch(() => ({}));
+                    throw new Error(errData.error || `Server error ${response.status}`);
                 }
 
                 const result = await response.json();
                 chatMessages.removeChild(loadingMsg);
                 addMessage(result.reply, 'ai');
+
+                // ── Increment usage count on success ──
+                await incrementUsage(usage);
+                const newRemaining = remaining - 1;
+                if (newRemaining <= WARN_AT && newRemaining > 0) {
+                    showRateNotice('rate-warn',
+                        `⚠️ ${newRemaining} prompt${newRemaining !== 1 ? 's' : ''} remaining today.`);
+                } else if (newRemaining <= 0) {
+                    showRateNotice('rate-error',
+                        `🚫 Daily limit reached. Resets ${formatTimeLeft(resetTime)}.`);
+                    chatInput.disabled = true;
+                    chatSendBtn.disabled = true;
+                } else {
+                    hideRateNotice();
+                }
+
             } catch (error) {
-                console.error("AI Error:", error);
+                console.error('AI Error:', error);
                 chatMessages.removeChild(loadingMsg);
-                addMessage("Sorry, I encountered an error. Please ensure the backend is deployed.", 'ai');
+                addMessage(`Sorry, something went wrong: ${error.message}`, 'ai');
             }
         }
 
