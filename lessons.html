@@ -13,10 +13,10 @@
     <header>
         <a href="home page.html" class="header-logo">Decision <span>Graveyard</span></a>
         <div class="profile">
-            <span class="profile-name">Name</span>
-            <div class="avatar" id="avatarBtn">N</div>
+            <span class="profile-name"></span>
+            <div class="avatar" id="avatarBtn"></div>
             <div class="dropdown" id="dropdown">
-                <p>Name</p>
+                <p class="profile-name-full"></p>
                 <hr>
                 <a href="settings.html">Settings</a>
                 <a href="#" id="logoutBtn">Log out</a>
@@ -245,10 +245,10 @@
                 let displayName = user.email.split('@')[0];
                 if (userDoc.exists()) {
                     const data = userDoc.data();
-                    displayName = data.firstName || data.username || displayName;
+                    displayName = data.username || data.firstName || displayName;
                 }
                 document.querySelector('.profile-name').textContent = displayName;
-                document.querySelector('.dropdown p').textContent = displayName;
+                document.querySelector('.profile-name-full').textContent = displayName;
                 document.getElementById('avatarBtn').textContent = displayName.charAt(0).toUpperCase();
 
                 await loadDecisions();

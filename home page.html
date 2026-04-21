@@ -98,8 +98,9 @@
                     // Try to get username from Firestore or fallback to email
                     const userDoc = await getDoc(doc(db, 'users', user.uid));
                     let displayName = user.email.split('@')[0];
-                    if (userDoc.exists() && userDoc.data().username) {
-                        displayName = userDoc.data().username;
+                    if (userDoc.exists()) {
+                        const data = userDoc.data();
+                        displayName = data.username || data.firstName || displayName;
                     }
                     
                     document.querySelector('.profile-name').textContent = displayName;

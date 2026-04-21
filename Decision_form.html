@@ -185,7 +185,7 @@
                 let displayName = user.email.split('@')[0];
                 if (userDoc.exists()) {
                     const data = userDoc.data();
-                    displayName = data.firstName || data.username || displayName;
+                    displayName = data.username || data.firstName || displayName;
                 }
                 document.querySelector('.profile-name').textContent = displayName;
                 document.querySelector('.dropdown p').textContent = displayName;

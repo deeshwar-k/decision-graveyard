@@ -28,24 +28,30 @@ module.exports = async function handler(req, res) {
 
     try {
         // ── Verify Firebase ID token via REST API ────────
-        // This works on any platform — no service account needed.
-        if (FIREBASE_API_KEY) {
-            const verifyRes = await fetch(
-                `https://identitytoolkit.googleapis.com/v1/accounts:lookup?key=${FIREBASE_API_KEY}`,
-                {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ idToken: token }),
-                }
-            );
-            if (!verifyRes.ok) {
-                return res.status(401).json({ error: "Invalid or expired session. Please log in again." });
+        if (!FIREBASE_API_KEY) {
+            console.error("FIREBASE_API_KEY is missing from environment variables.");
+            return res.status(500).json({ error: "Server configuration error: Firebase API key missing." });
+        }
+
+        const verifyRes = await fetch(
+            `https://identitytoolkit.googleapis.com/v1/accounts:lookup?key=${FIREBASE_API_KEY}`,
+            {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ idToken: token }),
             }
+        );
+        
+        if (!verifyRes.ok) {
+            const verifyErr = await verifyRes.json().catch(() => ({}));
+            console.error("Firebase token verification failed:", verifyErr);
+            return res.status(401).json({ error: "Invalid or expired session. Please log in again." });
         }
 
         // ── Gemini API call ──────────────────────────────
         if (!GEMINI_API_KEY) {
-            return res.status(500).json({ error: "Gemini API key is not configured on the server." });
+            console.error("GEMINI_API_KEY is missing from environment variables.");
+            return res.status(500).json({ error: "Server configuration error: Gemini API key missing." });
         }
 
         const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
@@ -60,13 +66,30 @@ ${contextText || "(No decisions or lessons logged yet)"}
 
 User's question: ${message}`;
 
+        console.log("Sending prompt to Gemini...");
         const result = await model.generateContent(prompt);
+        
+        if (!result || !result.response) {
+            throw new Error("Empty response from Gemini API.");
+        }
+
         const responseText = result.response.text();
+        console.log("Successfully received response from Gemini.");
 
         return res.status(200).json({ reply: responseText });
 
     } catch (error) {
-        console.error("AI Handler Error:", error.message || error);
-        return res.status(500).json({ error: "Failed to get AI response. Please try again shortly." });
+        console.error("AI Handler Exception:", error);
+        
+        let clientMessage = "Failed to get AI response. Please try again shortly.";
+        if (error.message && error.message.includes("quota")) {
+            clientMessage = "The AI service is currently busy (quota exceeded). Please try again in a few minutes.";
+        } else if (error.message && error.message.includes("API key")) {
+            clientMessage = "Authentication error with the AI service. Please contact support.";
+        } else if (error.message && error.message.includes("safety")) {
+            clientMessage = "I'm sorry, I cannot answer that question as it was flagged by my safety filters.";
+        }
+
+        return res.status(500).json({ error: clientMessage });
     }
 };
