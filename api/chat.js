@@ -94,18 +94,30 @@ User's question: ${message}`;
     } catch (error) {
         console.error("AI Handler Exception:", error);
         
-        let clientMessage = "Failed to get AI response. Please try again shortly.";
-        if (error.message) {
-            if (error.message.includes("quota")) {
-                clientMessage = "The AI service is currently busy (quota exceeded). Please try again in a few minutes.";
-            } else if (error.message.includes("API key")) {
-                clientMessage = "Authentication error with the AI service. Please contact support.";
-            } else if (error.message.includes("safety")) {
-                clientMessage = "I'm sorry, I cannot answer that question as it was flagged by my safety filters.";
-            } else {
-                // Return the actual error message to help the user debug
-                clientMessage = `AI Error: ${error.message}`;
+        let clientMessage = `AI Error: ${error.message}`;
+
+        // Diagnostic: If 404, try to see what models ARE available
+        if (error.message && error.message.includes("404")) {
+            try {
+                const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
+                // We use the base fetch because the SDK might not have a direct listModels exposed easily in this version
+                const listRes = await fetch(`https://generativelanguage.googleapis.com/v1/models?key=${GEMINI_API_KEY}`);
+                if (listRes.ok) {
+                    const data = await listRes.json();
+                    const modelNames = data.models ? data.models.map(m => m.name.replace('models/', '')).join(', ') : "None found";
+                    clientMessage = `Model Not Found (404). Your key has access to: [${modelNames}]. Please check if Gemini is enabled in your Google Cloud Console if the list is empty.`;
+                }
+            } catch (diagError) {
+                console.error("Diagnostics failed:", diagError);
             }
+        }
+
+        if (error.message && error.message.includes("quota")) {
+            clientMessage = "The AI service is currently busy (quota exceeded). Please try again in a few minutes.";
+        } else if (error.message && error.message.includes("API key")) {
+            clientMessage = "Authentication error with the AI service. Please contact support.";
+        } else if (error.message && error.message.includes("safety")) {
+            clientMessage = "I'm sorry, I cannot answer that question as it was flagged by my safety filters.";
         }
 
         return res.status(500).json({ error: clientMessage });
