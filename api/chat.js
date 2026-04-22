@@ -55,7 +55,15 @@ module.exports = async function handler(req, res) {
         }
 
         const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
-        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+        
+        let model;
+        try {
+            // Try 1.5 Flash first (newer, faster)
+            model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+        } catch (e) {
+            console.warn("Gemini 1.5 Flash failed to initialize, falling back to Gemini Pro");
+            model = genAI.getGenerativeModel({ model: "gemini-pro" });
+        }
 
         const prompt = `You are the AI assistant for "Decision Graveyard", a personal decision-tracking app.
 Your role is to help the user reflect on their past decisions and lessons, identify patterns, and make better future choices.
@@ -67,7 +75,18 @@ ${contextText || "(No decisions or lessons logged yet)"}
 User's question: ${message}`;
 
         console.log("Sending prompt to Gemini...");
-        const result = await model.generateContent(prompt);
+        let result;
+        try {
+            result = await model.generateContent(prompt);
+        } catch (e) {
+            if (e.message && e.message.includes("404")) {
+                console.warn("Primary model returned 404, trying fallback 'gemini-pro'...");
+                const fallbackModel = genAI.getGenerativeModel({ model: "gemini-pro" });
+                result = await fallbackModel.generateContent(prompt);
+            } else {
+                throw e;
+            }
+        }
         
         if (!result || !result.response) {
             throw new Error("Empty response from Gemini API.");
