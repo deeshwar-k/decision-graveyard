@@ -54,10 +54,11 @@ module.exports = async function handler(req, res) {
             return res.status(500).json({ error: "Server configuration error: Gemini API key missing." });
         }
 
-        // Use v1 explicitly to avoid v1beta 404 issues
+        // Use v1 explicitly
         const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
         
-        const modelOptions = { model: "gemini-1.5-flash" };
+        // Based on diagnostics, the user has access to gemini-2.5-flash
+        const modelOptions = { model: "gemini-2.5-flash" };
         const requestOptions = { apiVersion: "v1" };
 
         let model = genAI.getGenerativeModel(modelOptions, requestOptions);
@@ -77,8 +78,8 @@ User's question: ${message}`;
             result = await model.generateContent(prompt);
         } catch (e) {
             console.error("Primary model failed:", e.message);
-            // Fallback attempt with gemini-pro on v1
-            const fallbackModel = genAI.getGenerativeModel({ model: "gemini-pro" }, { apiVersion: "v1" });
+            // Fallback to 2.0 flash which was also in the list
+            const fallbackModel = genAI.getGenerativeModel({ model: "gemini-2.0-flash" }, { apiVersion: "v1" });
             result = await fallbackModel.generateContent(prompt);
         }
         
@@ -95,22 +96,6 @@ User's question: ${message}`;
         console.error("AI Handler Exception:", error);
         
         let clientMessage = `AI Error: ${error.message}`;
-
-        // Diagnostic: If 404, try to see what models ARE available
-        if (error.message && error.message.includes("404")) {
-            try {
-                const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
-                // We use the base fetch because the SDK might not have a direct listModels exposed easily in this version
-                const listRes = await fetch(`https://generativelanguage.googleapis.com/v1/models?key=${GEMINI_API_KEY}`);
-                if (listRes.ok) {
-                    const data = await listRes.json();
-                    const modelNames = data.models ? data.models.map(m => m.name.replace('models/', '')).join(', ') : "None found";
-                    clientMessage = `Model Not Found (404). Your key has access to: [${modelNames}]. Please check if Gemini is enabled in your Google Cloud Console if the list is empty.`;
-                }
-            } catch (diagError) {
-                console.error("Diagnostics failed:", diagError);
-            }
-        }
 
         if (error.message && error.message.includes("quota")) {
             clientMessage = "The AI service is currently busy (quota exceeded). Please try again in a few minutes.";
