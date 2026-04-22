@@ -56,14 +56,6 @@
 
                     <!-- Profile tab -->
                     <div class="tab-panel active" id="tab-profile">
-                        <div class="avatar-row">
-                            <div class="avatar-large">N</div>
-                            <div class="avatar-actions">
-                                <p>JPG or PNG, max 2 MB</p>
-                                <button class="btn btn-ghost" style="width: fit-content; padding: 7px 14px;">Upload photo</button>
-                            </div>
-                        </div>
-                        <hr class="divider">
                         <div class="field-row">
                             <div class="field-group">
                                 <label for="firstName">First name</label>
@@ -176,7 +168,6 @@
                     document.querySelector('.dropdown p').textContent = displayName;
                     const init = displayName.charAt(0).toUpperCase();
                     document.getElementById('avatarBtn').textContent = init;
-                    document.querySelector('.avatar-large').textContent = init;
                 }
             }
 

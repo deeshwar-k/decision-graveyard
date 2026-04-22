@@ -82,12 +82,17 @@ User's question: ${message}`;
         console.error("AI Handler Exception:", error);
         
         let clientMessage = "Failed to get AI response. Please try again shortly.";
-        if (error.message && error.message.includes("quota")) {
-            clientMessage = "The AI service is currently busy (quota exceeded). Please try again in a few minutes.";
-        } else if (error.message && error.message.includes("API key")) {
-            clientMessage = "Authentication error with the AI service. Please contact support.";
-        } else if (error.message && error.message.includes("safety")) {
-            clientMessage = "I'm sorry, I cannot answer that question as it was flagged by my safety filters.";
+        if (error.message) {
+            if (error.message.includes("quota")) {
+                clientMessage = "The AI service is currently busy (quota exceeded). Please try again in a few minutes.";
+            } else if (error.message.includes("API key")) {
+                clientMessage = "Authentication error with the AI service. Please contact support.";
+            } else if (error.message.includes("safety")) {
+                clientMessage = "I'm sorry, I cannot answer that question as it was flagged by my safety filters.";
+            } else {
+                // Return the actual error message to help the user debug
+                clientMessage = `AI Error: ${error.message}`;
+            }
         }
 
         return res.status(500).json({ error: clientMessage });
