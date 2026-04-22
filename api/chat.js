@@ -57,8 +57,8 @@ module.exports = async function handler(req, res) {
         // Use v1 explicitly
         const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
         
-        // Based on diagnostics, the user has access to gemini-2.5-flash
-        const modelOptions = { model: "gemini-2.5-flash" };
+        // Use Flash Lite for the highest possible quota/rate-limits on the free tier
+        const modelOptions = { model: "gemini-2.0-flash-lite" };
         const requestOptions = { apiVersion: "v1" };
 
         let model = genAI.getGenerativeModel(modelOptions, requestOptions);
@@ -72,14 +72,14 @@ ${contextText || "(No decisions or lessons logged yet)"}
 
 User's question: ${message}`;
 
-        console.log("Sending prompt to Gemini...");
+        console.log("Sending prompt to Gemini (Lite)...");
         let result;
         try {
             result = await model.generateContent(prompt);
         } catch (e) {
             console.error("Primary model failed:", e.message);
-            // Fallback to 2.0 flash which was also in the list
-            const fallbackModel = genAI.getGenerativeModel({ model: "gemini-2.0-flash" }, { apiVersion: "v1" });
+            // Fallback to 2.5 Flash Lite
+            const fallbackModel = genAI.getGenerativeModel({ model: "gemini-2.5-flash-lite" }, { apiVersion: "v1" });
             result = await fallbackModel.generateContent(prompt);
         }
         
