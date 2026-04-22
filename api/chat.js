@@ -54,16 +54,13 @@ module.exports = async function handler(req, res) {
             return res.status(500).json({ error: "Server configuration error: Gemini API key missing." });
         }
 
+        // Use v1 explicitly to avoid v1beta 404 issues
         const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
         
-        let model;
-        try {
-            // Try 1.5 Flash first (newer, faster)
-            model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
-        } catch (e) {
-            console.warn("Gemini 1.5 Flash failed to initialize, falling back to Gemini Pro");
-            model = genAI.getGenerativeModel({ model: "gemini-pro" });
-        }
+        const modelOptions = { model: "gemini-1.5-flash" };
+        const requestOptions = { apiVersion: "v1" };
+
+        let model = genAI.getGenerativeModel(modelOptions, requestOptions);
 
         const prompt = `You are the AI assistant for "Decision Graveyard", a personal decision-tracking app.
 Your role is to help the user reflect on their past decisions and lessons, identify patterns, and make better future choices.
@@ -79,13 +76,10 @@ User's question: ${message}`;
         try {
             result = await model.generateContent(prompt);
         } catch (e) {
-            if (e.message && e.message.includes("404")) {
-                console.warn("Primary model returned 404, trying fallback 'gemini-pro'...");
-                const fallbackModel = genAI.getGenerativeModel({ model: "gemini-pro" });
-                result = await fallbackModel.generateContent(prompt);
-            } else {
-                throw e;
-            }
+            console.error("Primary model failed:", e.message);
+            // Fallback attempt with gemini-pro on v1
+            const fallbackModel = genAI.getGenerativeModel({ model: "gemini-pro" }, { apiVersion: "v1" });
+            result = await fallbackModel.generateContent(prompt);
         }
         
         if (!result || !result.response) {
