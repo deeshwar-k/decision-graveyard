@@ -266,9 +266,9 @@
             snap.forEach(doc => {
                 const d = doc.data();
                 const opt = document.createElement('option');
-                opt.value = doc.id; // Store document ID
+                opt.value = doc.id;
                 opt.textContent = d.title;
-                allDecisions.push({ id: doc.id, title: d.title });
+                allDecisions.push({ id: doc.id, ...d });
                 select.appendChild(opt);
             });
         }
@@ -690,7 +690,12 @@
                     contextText += '(No decisions logged yet)\n';
                 } else {
                     allDecisions.slice(0, 20).forEach(d => {
-                        contextText += `- Decision: ${d.title}\n  Category: ${d.category}\n  Outcome: ${d.outcome}\n  Reflection: ${d.reflection || 'None'}\n\n`;
+                        contextText += `- Decision: ${d.title}\n`;
+                        contextText += `  Category: ${d.category || 'N/A'}\n`;
+                        contextText += `  Situation: ${d.situation || 'N/A'}\n`;
+                        contextText += `  Risk Level: ${d.riskLevel || 'N/A'}\n`;
+                        contextText += `  Thoughts: ${d.thoughts || 'N/A'}\n`;
+                        contextText += `  Outcome: ${d.outcome || 'N/A'}\n\n`;
                     });
                 }
                 contextText += "USER'S LESSONS LEARNED:\n";
