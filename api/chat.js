@@ -54,14 +54,17 @@ module.exports = async function handler(req, res) {
             return res.status(500).json({ error: "Server configuration error: Gemini API key missing." });
         }
 
-        // Use v1 explicitly
         const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
         
-        // Use gemini-2.0-flash as primary (most stable 2.0)
-        const modelOptions = { model: "gemini-2.0-flash" };
-        const requestOptions = { apiVersion: "v1" };
-
-        let model = genAI.getGenerativeModel(modelOptions, requestOptions);
+        // List of models to try in order of likelihood of having quota
+        // Including 3.1 and 2.5 as requested by the user
+        const modelsToTry = [
+            { name: "gemini-3.1-flash-lite", version: "v1beta" },
+            { name: "gemini-2.5-flash-lite", version: "v1beta" },
+            { name: "gemini-2.0-flash-lite", version: "v1" },
+            { name: "gemini-1.5-flash", version: "v1" },
+            { name: "gemini-1.5-flash-latest", version: "v1beta" }
+        ];
 
         const prompt = `You are the AI assistant for "Decision Graveyard", a personal decision-tracking app.
 Your role is to help the user reflect on their past decisions and lessons, identify patterns, and make better future choices.
@@ -72,15 +75,28 @@ ${contextText || "(No decisions or lessons logged yet)"}
 
 User's question: ${message}`;
 
-        console.log("Sending prompt to Gemini 2.0 Flash...");
         let result;
-        try {
-            result = await model.generateContent(prompt);
-        } catch (e) {
-            console.error("Primary model failed:", e.message);
-            // Fallback to Lite version which has higher quota
-            const fallbackModel = genAI.getGenerativeModel({ model: "gemini-2.0-flash-lite" }, { apiVersion: "v1" });
-            result = await fallbackModel.generateContent(prompt);
+        let lastError;
+
+        for (const modelCfg of modelsToTry) {
+            try {
+                console.log(`Attempting Gemini with model: ${modelCfg.name} (${modelCfg.version})...`);
+                const model = genAI.getGenerativeModel({ model: modelCfg.name }, { apiVersion: modelCfg.version });
+                result = await model.generateContent(prompt);
+                if (result && result.response) {
+                    console.log(`Success with ${modelCfg.name}!`);
+                    break; 
+                }
+            } catch (e) {
+                console.warn(`${modelCfg.name} failed:`, e.message);
+                lastError = e;
+                // If it's a quota error, we definitely want to try the next model
+                continue;
+            }
+        }
+
+        if (!result || !result.response) {
+            throw lastError || new Error("All models failed to respond.");
         }
         
         if (!result || !result.response) {
