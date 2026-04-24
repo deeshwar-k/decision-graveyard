@@ -269,6 +269,7 @@
                 }
 
                 showToast('\u2713 Decision saved!');
+                sessionStorage.removeItem('decisionDraft');
                 setTimeout(() => {
                     window.location.href = 'Timeline page.html';
                 }, 1000);
@@ -309,6 +310,67 @@
         document.querySelector('.btn.btn-ghost').addEventListener('click', function() {
             window.location.href = 'home page.html';
         });
+
+        // --- Form Draft Saving ---
+        const draftKey = 'decisionDraft';
+        const formFields = ['ftitle', 'fcategory', 'fdate', 'ftags', 'fsituation', 'fthoughts', 'ffdecision'];
+        const formRadios = ['flevel', 'foutcome'];
+
+        function saveDraft() {
+            const draft = {};
+            formFields.forEach(name => {
+                const el = document.querySelector(`[name="${name}"]`);
+                if (el) draft[name] = el.value;
+            });
+            formRadios.forEach(name => {
+                const checked = document.querySelector(`input[name="${name}"]:checked`);
+                if (checked) draft[name] = checked.value;
+            });
+            sessionStorage.setItem(draftKey, JSON.stringify(draft));
+        }
+
+        function loadDraft() {
+            const saved = sessionStorage.getItem(draftKey);
+            if (!saved) return;
+            try {
+                const draft = JSON.parse(saved);
+                formFields.forEach(name => {
+                    const el = document.querySelector(`[name="${name}"]`);
+                    if (el && draft[name] !== undefined) el.value = draft[name];
+                });
+                formRadios.forEach(name => {
+                    if (draft[name]) {
+                        const radio = document.querySelector(`input[name="${name}"][value="${draft[name]}"]`);
+                        if (radio) {
+                            radio.checked = true;
+                            // Trigger the visual styling by finding the closest radio-opt label
+                            const opt = radio.closest('.radio-opt');
+                            if (opt) {
+                                const group = opt.dataset.group;
+                                document.querySelectorAll(`[data-group="${group}"]`).forEach(o => o.className = 'radio-opt');
+                                opt.classList.add('selected-' + opt.dataset.val);
+                            }
+                        }
+                    }
+                });
+            } catch(e) {}
+        }
+
+        // Attach listeners
+        formFields.forEach(name => {
+            const el = document.querySelector(`[name="${name}"]`);
+            if (el) {
+                el.addEventListener('input', saveDraft);
+                if (el.tagName === 'SELECT') el.addEventListener('change', saveDraft);
+            }
+        });
+        
+        // For radios, clicking the label updates the radio, but we need to ensure saveDraft runs after
+        document.querySelectorAll('.radio-opt').forEach(opt => {
+            opt.addEventListener('click', () => setTimeout(saveDraft, 0));
+        });
+
+        document.addEventListener('DOMContentLoaded', loadDraft);
     </script>
 
 </body>

@@ -446,6 +446,7 @@
             editingId = null;
             document.getElementById('modalTitle').textContent = 'Write a Lesson';
             clearForm();
+            loadLessonDraft();
             modalOverlay.classList.add('open');
             document.getElementById('lessonTitle').focus();
         }
@@ -523,6 +524,7 @@
                     lessonData.date = new Date().toISOString(); // storing date as fallback
                     const docRef = await addDoc(collection(db, 'users', currentUser.uid, 'lessons'), lessonData);
                     lessons.unshift({ id: docRef.id, ...lessonData });
+                    sessionStorage.removeItem(lessonDraftKey); // Clear draft after save
                 }
                 closeModal();
                 render();
@@ -535,11 +537,47 @@
             }
         });
 
-        /* Clear error highlight on input */
+        // --- Write Lesson Draft Saving ---
+        const lessonDraftKey = 'lessonDraft';
+
+        function saveLessonDraft() {
+            if (editingId !== null) return;
+            const draft = {
+                title: document.getElementById('lessonTitle').value,
+                body: document.getElementById('lessonBody').value,
+                decisionId: document.getElementById('lessonDecision').value,
+                category: document.getElementById('lessonCategory').value,
+                tags: document.getElementById('lessonTags').value,
+                pinned: document.getElementById('lessonPinned').checked
+            };
+            sessionStorage.setItem(lessonDraftKey, JSON.stringify(draft));
+        }
+
+        function loadLessonDraft() {
+            if (editingId !== null) return;
+            const saved = sessionStorage.getItem(lessonDraftKey);
+            if (!saved) return;
+            try {
+                const draft = JSON.parse(saved);
+                document.getElementById('lessonTitle').value = draft.title || '';
+                document.getElementById('lessonBody').value = draft.body || '';
+                document.getElementById('lessonDecision').value = draft.decisionId || '';
+                document.getElementById('lessonCategory').value = draft.category || '';
+                document.getElementById('lessonTags').value = draft.tags || '';
+                document.getElementById('lessonPinned').checked = draft.pinned || false;
+            } catch(e) {}
+        }
+
+        /* Clear error highlight on input & Save Draft */
         ['lessonTitle','lessonBody'].forEach(id => {
             document.getElementById(id).addEventListener('input', function() {
                 this.classList.remove('field-error');
+                saveLessonDraft();
             });
+        });
+        document.getElementById('lessonTags').addEventListener('input', saveLessonDraft);
+        ['lessonDecision','lessonCategory','lessonPinned'].forEach(id => {
+            document.getElementById(id).addEventListener('change', saveLessonDraft);
         });
 
         /* ════ DELETE MODAL ════ */
@@ -594,7 +632,7 @@
             setTimeout(() => { chatFab.style.display = 'flex'; }, 300);
         });
 
-        function addMessage(text, sender) {
+        function addMessage(text, sender, save = true) {
             const wrapper = document.createElement('div');
             wrapper.className = `chat-msg ${sender}-msg`;
             const bubble = document.createElement('div');
@@ -604,8 +642,30 @@
             wrapper.appendChild(bubble);
             chatMessages.appendChild(wrapper);
             chatMessages.scrollTop = chatMessages.scrollHeight;
+
+            if (save && text !== 'Thinking...') {
+                let history = [];
+                const saved = sessionStorage.getItem('aiChatHistory');
+                if (saved) { try { history = JSON.parse(saved); } catch(e){} }
+                history.push({ text, sender });
+                sessionStorage.setItem('aiChatHistory', JSON.stringify(history));
+            }
             return wrapper;
         }
+
+        function loadChatHistory() {
+            const saved = sessionStorage.getItem('aiChatHistory');
+            if (saved) {
+                try {
+                    const history = JSON.parse(saved);
+                    if (history && history.length > 0) {
+                        chatMessages.innerHTML = ''; // clear default message
+                        history.forEach(msg => addMessage(msg.text, msg.sender, false));
+                    }
+                } catch(e) {}
+            }
+        }
+        loadChatHistory();
 
         /* ════ RATE LIMITING ════ */
         const DAILY_LIMIT = 20;
