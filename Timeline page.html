@@ -187,6 +187,39 @@
         </div>
     </div>
 
+    <!-- VIEW MODAL -->
+    <div class="modal-overlay" id="viewModal">
+        <div class="modal modal--wide">
+            <h2 class="modal-title" id="viewTitle" style="margin-bottom: 8px;">Decision Title</h2>
+            <div class="view-meta" id="viewMetaWrapper" style="display:flex; gap:8px; margin-bottom:24px;">
+                <span class="tl-date" id="viewDate" style="display:flex; align-items:center;">Date</span>
+                <span class="tl-badge" id="viewCategory">Category</span>
+                <span class="tl-outcome-pill" id="viewOutcome">Outcome</span>
+            </div>
+            <div class="view-content" style="display:flex; flex-direction:column; gap:20px; text-align:left;">
+                <div class="view-detail-group">
+                    <div class="view-detail-label" style="font-size:12px; color:var(--text-muted); font-weight:600; text-transform:uppercase; letter-spacing:0.04em; margin-bottom:4px;">Situation</div>
+                    <div class="view-detail-value" id="viewSituation" style="font-size:14px; line-height:1.6; color:var(--text); white-space:pre-wrap;"></div>
+                </div>
+                <div class="view-detail-group">
+                    <div class="view-detail-label" style="font-size:12px; color:var(--text-muted); font-weight:600; text-transform:uppercase; letter-spacing:0.04em; margin-bottom:4px;">Thought Process</div>
+                    <div class="view-detail-value" id="viewThoughts" style="font-size:14px; line-height:1.6; color:var(--text); white-space:pre-wrap;"></div>
+                </div>
+                <div class="view-detail-group">
+                    <div class="view-detail-label" style="font-size:12px; color:var(--text-muted); font-weight:600; text-transform:uppercase; letter-spacing:0.04em; margin-bottom:4px;">Final Decision</div>
+                    <div class="view-detail-value" id="viewFinalDecision" style="font-size:14px; line-height:1.6; color:var(--text); white-space:pre-wrap;"></div>
+                </div>
+                <div class="view-detail-group" id="viewTagsGroup" style="display:none;">
+                    <div class="view-detail-label" style="font-size:12px; color:var(--text-muted); font-weight:600; text-transform:uppercase; letter-spacing:0.04em; margin-bottom:8px;">Tags</div>
+                    <div class="tl-tags" id="viewTags"></div>
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button class="btn-modal-cancel" id="closeView">Close</button>
+            </div>
+        </div>
+    </div>
+
     <!-- EDIT MODAL -->
     <div class="modal-overlay" id="editModal">
         <div class="modal modal--wide">
@@ -545,6 +578,53 @@
         cancelEdit.addEventListener('click', () => { editingId = null; editModal.classList.remove('open'); });
         editModal.addEventListener('click', function(e) {
             if (e.target === editModal) { editingId = null; editModal.classList.remove('open'); }
+        });
+
+        /* ── VIEW DECISION ── */
+        const viewModal = document.getElementById('viewModal');
+        const closeView = document.getElementById('closeView');
+
+        document.getElementById('timeline').addEventListener('click', function(e) {
+            const card = e.target.closest('.tl-card');
+            if (!card) return;
+            // Ignore clicks on action buttons
+            if (e.target.closest('.tl-btn')) return;
+
+            const item = card.closest('.tl-item');
+            const id = item.dataset.id;
+            const decision = allDecisions.find(d => d.id === id);
+            if (!decision) return;
+
+            document.getElementById('viewTitle').textContent = decision.title || 'Untitled';
+            
+            const dateObj = new Date((decision.date || '2000-01-01') + 'T00:00:00');
+            document.getElementById('viewDate').textContent = dateObj.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+            
+            const cat = decision.category || 'other';
+            document.getElementById('viewCategory').textContent = cat.charAt(0).toUpperCase() + cat.slice(1);
+            
+            const outcomeEl = document.getElementById('viewOutcome');
+            outcomeEl.textContent = outcomeLabels[decision.outcome] || 'Unknown';
+            document.getElementById('viewMetaWrapper').className = 'view-meta ' + (decision.outcome || '');
+
+            document.getElementById('viewSituation').textContent = decision.situation || 'No situation recorded.';
+            document.getElementById('viewThoughts').textContent = decision.thoughts || 'No thought process recorded.';
+            document.getElementById('viewFinalDecision').textContent = decision.finalDecision || 'No final decision recorded.';
+
+            const tagsContainer = document.getElementById('viewTags');
+            if (decision.tags && decision.tags.length > 0) {
+                tagsContainer.innerHTML = decision.tags.map(t => `<span class="tl-tag">${t}</span>`).join('');
+                document.getElementById('viewTagsGroup').style.display = 'block';
+            } else {
+                document.getElementById('viewTagsGroup').style.display = 'none';
+            }
+
+            viewModal.classList.add('open');
+        });
+
+        closeView.addEventListener('click', () => viewModal.classList.remove('open'));
+        viewModal.addEventListener('click', function(e) {
+            if (e.target === viewModal) viewModal.classList.remove('open');
         });
     </script>
 
