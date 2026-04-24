@@ -425,7 +425,8 @@ nav {
 
 .chat-window {
     position: fixed; bottom: 28px; right: 28px;
-    width: 360px;
+    width: 450px;
+    max-width: calc((100vw - 220px) / 2);
     height: 520px;
     max-height: calc(100vh - 120px); /* never overlap header (60px) + breathing room */
     background: var(--bg-card); border: 1px solid var(--border);
@@ -579,4 +580,4 @@ nav {
     .lc-top { flex-direction: column; }
     .lc-actions { align-self: flex-end; }
     .field-row { flex-direction: column; }
-}
+}
