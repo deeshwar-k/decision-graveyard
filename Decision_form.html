@@ -55,15 +55,18 @@
                             <input type="text" name="ftitle" placeholder="What did you decide?">
                         </div>
                         <div class="form-group">
-                            <label>Category</label>
-                            <select name="fcategory">
-                                <option>Career</option>
-                                <option>Education</option>
-                                <option>Finance</option>
-                                <option>Health</option>
-                                <option>Personal</option>
-                                <option>Other</option>
-                            </select>
+                            <label>Categories</label>
+                            <div class="multi-select" id="fcategorySelect">
+                                <div class="ms-header" id="fcategoryHeader">Select categories...</div>
+                                <div class="ms-options">
+                                    <label class="ms-opt"><input type="checkbox" name="fcategory" value="career"> Career</label>
+                                    <label class="ms-opt"><input type="checkbox" name="fcategory" value="education"> Education</label>
+                                    <label class="ms-opt"><input type="checkbox" name="fcategory" value="finance"> Finance</label>
+                                    <label class="ms-opt"><input type="checkbox" name="fcategory" value="health"> Health</label>
+                                    <label class="ms-opt"><input type="checkbox" name="fcategory" value="personal"> Personal</label>
+                                    <label class="ms-opt"><input type="checkbox" name="fcategory" value="other"> Other</label>
+                                </div>
+                            </div>
                         </div>
                         <div class="form-group">
                             <label>Date</label>
@@ -212,7 +215,7 @@
 
             try {
                 const title = document.querySelector('[name="ftitle"]').value.trim();
-                const category = document.querySelector('[name="fcategory"]').value.toLowerCase();
+                const categories = Array.from(document.querySelectorAll('input[name="fcategory"]:checked')).map(cb => cb.value);
                 const date = document.querySelector('[name="fdate"]').value;
                 const tagsRaw = document.querySelector('[name="ftags"]').value;
                 const tags = tagsRaw.split(',').map(t => t.trim()).filter(Boolean);
@@ -227,8 +230,8 @@
                 const outcomeOpt = document.querySelector('input[name="foutcome"]:checked');
                 const outcome = outcomeOpt ? outcomeOpt.value : '';
 
-                if (!title || !category || !outcome) {
-                    showToast('Title, Category, and Outcome are required.');
+                if (!title || categories.length === 0 || !outcome) {
+                    showToast('Title, at least one Category, and Outcome are required.');
                     btn.textContent = originalText;
                     btn.disabled = false;
                     return;
@@ -236,7 +239,7 @@
 
                 // 1. Save Decision
                 await addDoc(collection(db, 'users', currentUser.uid, 'decisions'), {
-                    title, category, date, tags, situation, riskLevel, thoughts, finalDecision, outcome,
+                    title, categories, date, tags, situation, riskLevel, thoughts, finalDecision, outcome,
                     createdAt: serverTimestamp(),
                     updatedAt: serverTimestamp()
                 });
@@ -251,8 +254,10 @@
                     let outcomeKey = outcome === 'success' ? 'successes' : (outcome === 'failure' ? 'failures' : 'ongoing');
 
                     const byCat = stats.outcomesByCategory || {};
-                    if (!byCat[category]) byCat[category] = { success: 0, failure: 0, ongoing: 0 };
-                    byCat[category][outcome] = (byCat[category][outcome] || 0) + 1;
+                    categories.forEach(cat => {
+                        if (!byCat[cat]) byCat[cat] = { success: 0, failure: 0, ongoing: 0 };
+                        byCat[cat][outcome] = (byCat[cat][outcome] || 0) + 1;
+                    });
 
                     const byRisk = stats.outcomesByRisk || {};
                     if (riskLevel) {
@@ -311,10 +316,32 @@
             window.location.href = 'home page.html';
         });
 
+        // Multi-select dropdown
+        document.querySelectorAll('.multi-select').forEach(ms => {
+            const header = ms.querySelector('.ms-header');
+            header.addEventListener('click', (e) => {
+                e.stopPropagation();
+                ms.classList.toggle('open');
+            });
+            ms.addEventListener('click', e => e.stopPropagation());
+            
+            const checkboxes = ms.querySelectorAll('input[type="checkbox"]');
+            checkboxes.forEach(cb => {
+                cb.addEventListener('change', () => {
+                    const checked = Array.from(checkboxes).filter(c => c.checked).map(c => c.parentElement.textContent.trim());
+                    header.textContent = checked.length ? checked.join(', ') : 'Select categories...';
+                });
+            });
+        });
+        document.addEventListener('click', () => {
+            document.querySelectorAll('.multi-select').forEach(ms => ms.classList.remove('open'));
+        });
+
         // --- Form Draft Saving ---
         const draftKey = 'decisionDraft';
-        const formFields = ['ftitle', 'fcategory', 'fdate', 'ftags', 'fsituation', 'fthoughts', 'ffdecision'];
+        const formFields = ['ftitle', 'fdate', 'ftags', 'fsituation', 'fthoughts', 'ffdecision'];
         const formRadios = ['flevel', 'foutcome'];
+        const formCheckboxes = ['fcategory'];
 
         function saveDraft() {
             const draft = {};
@@ -325,6 +352,10 @@
             formRadios.forEach(name => {
                 const checked = document.querySelector(`input[name="${name}"]:checked`);
                 if (checked) draft[name] = checked.value;
+            });
+            formCheckboxes.forEach(name => {
+                const checked = Array.from(document.querySelectorAll(`input[name="${name}"]:checked`)).map(c => c.value);
+                draft[name] = checked;
             });
             sessionStorage.setItem(draftKey, JSON.stringify(draft));
         }
@@ -343,7 +374,6 @@
                         const radio = document.querySelector(`input[name="${name}"][value="${draft[name]}"]`);
                         if (radio) {
                             radio.checked = true;
-                            // Trigger the visual styling by finding the closest radio-opt label
                             const opt = radio.closest('.radio-opt');
                             if (opt) {
                                 const group = opt.dataset.group;
@@ -351,6 +381,17 @@
                                 opt.classList.add('selected-' + opt.dataset.val);
                             }
                         }
+                    }
+                });
+                formCheckboxes.forEach(name => {
+                    if (draft[name] && Array.isArray(draft[name])) {
+                        draft[name].forEach(val => {
+                            const cb = document.querySelector(`input[name="${name}"][value="${val}"]`);
+                            if (cb) {
+                                cb.checked = true;
+                                cb.dispatchEvent(new Event('change')); // update header text
+                            }
+                        });
                     }
                 });
             } catch(e) {}
@@ -363,6 +404,10 @@
                 el.addEventListener('input', saveDraft);
                 if (el.tagName === 'SELECT') el.addEventListener('change', saveDraft);
             }
+        });
+        
+        formCheckboxes.forEach(name => {
+            document.querySelectorAll(`input[name="${name}"]`).forEach(cb => cb.addEventListener('change', saveDraft));
         });
         
         // For radios, clicking the label updates the radio, but we need to ensure saveDraft runs after

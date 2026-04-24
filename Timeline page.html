@@ -191,9 +191,9 @@
     <div class="modal-overlay" id="viewModal">
         <div class="modal modal--wide">
             <h2 class="modal-title" id="viewTitle" style="margin-bottom: 8px;">Decision Title</h2>
-            <div class="view-meta" id="viewMetaWrapper" style="display:flex; gap:8px; margin-bottom:24px;">
+            <div class="view-meta" id="viewMetaWrapper" style="display:flex; gap:8px; margin-bottom:24px; flex-wrap:wrap;">
                 <span class="tl-date" id="viewDate" style="display:flex; align-items:center;">Date</span>
-                <span class="tl-badge" id="viewCategory">Category</span>
+                <span id="viewCategoryContainer" style="display:flex; gap:4px;"></span>
                 <span class="tl-outcome-pill" id="viewOutcome">Outcome</span>
             </div>
             <div class="view-content" style="display:flex; flex-direction:column; gap:20px; text-align:left;">
@@ -237,15 +237,18 @@
                 </div>
                 <div class="edit-row">
                     <div class="edit-group">
-                        <label>Category</label>
-                        <select id="editCategory">
-                            <option value="career">Career</option>
-                            <option value="finance">Finance</option>
-                            <option value="health">Health</option>
-                            <option value="personal">Personal</option>
-                            <option value="education">Education</option>
-                            <option value="other">Other</option>
-                        </select>
+                        <label>Categories</label>
+                        <div class="multi-select" id="editCategorySelect">
+                            <div class="ms-header" id="editCategoryHeader">Select categories...</div>
+                            <div class="ms-options">
+                                <label class="ms-opt"><input type="checkbox" name="editCategoryCb" value="career"> Career</label>
+                                <label class="ms-opt"><input type="checkbox" name="editCategoryCb" value="education"> Education</label>
+                                <label class="ms-opt"><input type="checkbox" name="editCategoryCb" value="finance"> Finance</label>
+                                <label class="ms-opt"><input type="checkbox" name="editCategoryCb" value="health"> Health</label>
+                                <label class="ms-opt"><input type="checkbox" name="editCategoryCb" value="personal"> Personal</label>
+                                <label class="ms-opt"><input type="checkbox" name="editCategoryCb" value="other"> Other</label>
+                            </div>
+                        </div>
                     </div>
                     <div class="edit-group">
                         <label>Outcome</label>
@@ -315,14 +318,16 @@
             allDecisions.forEach(d => {
                 stats.totalDecisions++;
                 const outcome = d.outcome || 'ongoing';
-                const cat = d.category || 'other';
                 const risk = d.riskLevel;
 
                 let outKey = outcome === 'success' ? 'successes' : (outcome === 'failure' ? 'failures' : 'ongoing');
                 stats[outKey] = (stats[outKey] || 0) + 1;
 
-                if (!stats.outcomesByCategory[cat]) stats.outcomesByCategory[cat] = { success:0, failure:0, ongoing:0 };
-                stats.outcomesByCategory[cat][outcome] = (stats.outcomesByCategory[cat][outcome] || 0) + 1;
+                const cats = d.categories || (d.category ? [d.category] : ['other']);
+                cats.forEach(c => {
+                    if (!stats.outcomesByCategory[c]) stats.outcomesByCategory[c] = { success:0, failure:0, ongoing:0 };
+                    stats.outcomesByCategory[c][outcome] = (stats.outcomesByCategory[c][outcome] || 0) + 1;
+                });
 
                 if (risk) {
                     if (!stats.outcomesByRisk[risk]) stats.outcomesByRisk[risk] = { success:0, failure:0, ongoing:0 };
@@ -341,6 +346,7 @@
             });
             renderTimeline();
             applyFilters();
+            checkRedirect();
         }
 
         const outcomeLabels = { success: 'Success', failure: 'Failure', ongoing: 'Still unfolding' };
@@ -375,13 +381,14 @@
                     item.className = `tl-item ${d.outcome}`;
                     item.dataset.id = d.id;
                     item.dataset.title = d.title || '';
-                    item.dataset.category = d.category || '';
+                    item.dataset.categories = JSON.stringify(d.categories || (d.category ? [d.category] : ['other']));
                     item.dataset.outcome = d.outcome || '';
                     item.dataset.date = d.date || '';
 
                     const dateObj = new Date((d.date || '2000-01-01') + 'T00:00:00');
                     const formattedDate = dateObj.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
-                    const capCat = d.category ? (d.category.charAt(0).toUpperCase() + d.category.slice(1)) : 'Other';
+                    const catsHtml = (d.categories || (d.category ? [d.category] : ['other']))
+                        .map(c => `<span class="tl-badge">${c.charAt(0).toUpperCase() + c.slice(1)}</span>`).join('');
 
                     const tagsHtml = (d.tags || []).map(t => `<span class="tl-tag">${t}</span>`).join('');
                     const noteText = d.situation || d.thoughts || '';
@@ -391,7 +398,7 @@
                         <div class="tl-card">
                             <div class="tl-card-top">
                                 <span class="tl-date">${formattedDate}</span>
-                                <span class="tl-badge">${capCat}</span>
+                                ${catsHtml}
                                 <span class="tl-outcome-pill">${outcomeLabels[d.outcome] || 'Unknown'}</span>
                                 <div class="tl-actions">
                                     <button class="tl-btn edit-btn" title="Edit">✏️</button>
@@ -440,12 +447,13 @@
             let visible = 0;
             allItems().forEach(item => {
                 const title = item.dataset.title.toLowerCase();
-                const cat   = item.dataset.category.toLowerCase();
+                let itemCats = [];
+                try { itemCats = JSON.parse(item.dataset.categories).map(c => c.toLowerCase()); } catch(e){}
                 const out   = item.dataset.outcome.toLowerCase();
                 const note  = item.querySelector('.tl-note')?.textContent.toLowerCase() || '';
 
                 const show = (!query || title.includes(query) || note.includes(query))
-                          && (!category || cat === category)
+                          && (!category || itemCats.includes(category))
                           && (!outcome  || out === outcome);
 
                 item.style.display = show ? '' : 'none';
@@ -530,7 +538,14 @@
 
             document.getElementById('editTitle').value    = item.dataset.title;
             document.getElementById('editDate').value     = item.dataset.date;
-            document.getElementById('editCategory').value = item.dataset.category;
+            
+            let itemCats = [];
+            try { itemCats = JSON.parse(item.dataset.categories); } catch(e){}
+            document.querySelectorAll('input[name="editCategoryCb"]').forEach(cb => {
+                cb.checked = itemCats.includes(cb.value);
+                cb.dispatchEvent(new Event('change'));
+            });
+
             document.getElementById('editOutcome').value  = item.dataset.outcome;
             document.getElementById('editNote').value     = card.querySelector('.tl-note').textContent.trim();
             document.getElementById('editTags').value     = [...card.querySelectorAll('.tl-tag')].map(t => t.textContent).join(', ');
@@ -543,7 +558,7 @@
 
             const newTitle    = document.getElementById('editTitle').value.trim();
             const newDate     = document.getElementById('editDate').value;
-            const newCategory = document.getElementById('editCategory').value;
+            const newCategories = Array.from(document.querySelectorAll('input[name="editCategoryCb"]:checked')).map(cb => cb.value);
             const newOutcome  = document.getElementById('editOutcome').value;
             const newNote     = document.getElementById('editNote').value.trim();
             const newTags     = document.getElementById('editTags').value.split(',').map(t => t.trim()).filter(Boolean);
@@ -551,7 +566,7 @@
             const updates = {
                 title: newTitle,
                 date: newDate,
-                category: newCategory,
+                categories: newCategories,
                 outcome: newOutcome,
                 situation: newNote,
                 tags: newTags,
@@ -600,8 +615,8 @@
             const dateObj = new Date((decision.date || '2000-01-01') + 'T00:00:00');
             document.getElementById('viewDate').textContent = dateObj.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
             
-            const cat = decision.category || 'other';
-            document.getElementById('viewCategory').textContent = cat.charAt(0).toUpperCase() + cat.slice(1);
+            const cats = decision.categories || (decision.category ? [decision.category] : ['other']);
+            document.getElementById('viewCategoryContainer').innerHTML = cats.map(c => `<span class="tl-badge">${c.charAt(0).toUpperCase() + c.slice(1)}</span>`).join('');
             
             const outcomeEl = document.getElementById('viewOutcome');
             outcomeEl.textContent = outcomeLabels[decision.outcome] || 'Unknown';
@@ -626,6 +641,64 @@
         viewModal.addEventListener('click', function(e) {
             if (e.target === viewModal) viewModal.classList.remove('open');
         });
+
+        // Multi-select dropdown
+        document.querySelectorAll('.multi-select').forEach(ms => {
+            const header = ms.querySelector('.ms-header');
+            header.addEventListener('click', (e) => {
+                e.stopPropagation();
+                ms.classList.toggle('open');
+            });
+            ms.addEventListener('click', e => e.stopPropagation());
+            const checkboxes = ms.querySelectorAll('input[type="checkbox"]');
+            checkboxes.forEach(cb => {
+                cb.addEventListener('change', () => {
+                    const checked = Array.from(checkboxes).filter(c => c.checked).map(c => c.parentElement.textContent.trim());
+                    header.textContent = checked.length ? checked.join(', ') : 'Select categories...';
+                });
+            });
+        });
+        document.addEventListener('click', () => {
+            document.querySelectorAll('.multi-select').forEach(ms => ms.classList.remove('open'));
+        });
+
+        // Redirect check on load
+        function checkRedirect() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const decisionId = urlParams.get('decisionId');
+            if (decisionId && allDecisions.find(d => d.id === decisionId)) {
+                const decision = allDecisions.find(d => d.id === decisionId);
+                
+                document.getElementById('viewTitle').textContent = decision.title || 'Untitled';
+                
+                const dateObj = new Date((decision.date || '2000-01-01') + 'T00:00:00');
+                document.getElementById('viewDate').textContent = dateObj.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+                
+                const cats = decision.categories || (decision.category ? [decision.category] : ['other']);
+                document.getElementById('viewCategoryContainer').innerHTML = cats.map(c => `<span class="tl-badge">${c.charAt(0).toUpperCase() + c.slice(1)}</span>`).join('');
+                
+                const outcomeEl = document.getElementById('viewOutcome');
+                outcomeEl.textContent = outcomeLabels[decision.outcome] || 'Unknown';
+                document.getElementById('viewMetaWrapper').className = 'view-meta ' + (decision.outcome || '');
+
+                document.getElementById('viewSituation').textContent = decision.situation || 'No situation recorded.';
+                document.getElementById('viewThoughts').textContent = decision.thoughts || 'No thought process recorded.';
+                document.getElementById('viewFinalDecision').textContent = decision.finalDecision || 'No final decision recorded.';
+
+                const tagsContainer = document.getElementById('viewTags');
+                if (decision.tags && decision.tags.length > 0) {
+                    tagsContainer.innerHTML = decision.tags.map(t => `<span class="tl-tag">${t}</span>`).join('');
+                    document.getElementById('viewTagsGroup').style.display = 'block';
+                } else {
+                    document.getElementById('viewTagsGroup').style.display = 'none';
+                }
+
+                viewModal.classList.add('open');
+                
+                // Clear the URL param without refreshing
+                window.history.replaceState({}, document.title, window.location.pathname);
+            }
+        }
     </script>
 
 </body>

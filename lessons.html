@@ -133,15 +133,18 @@
                         </select>
                     </div>
                     <div class="field-group" style="flex:1">
-                        <label class="field-label">Category</label>
-                        <select class="field-input" id="lessonCategory">
-                            <option value="">— none —</option>
-                            <option value="Career">Career</option>
-                            <option value="Finance">Finance</option>
-                            <option value="Health">Health</option>
-                            <option value="Personal">Personal</option>
-                            <option value="Education">Education</option>
-                        </select>
+                        <label class="field-label">Categories</label>
+                        <div class="multi-select" id="lessonCategorySelect">
+                            <div class="ms-header" id="lessonCategoryHeader">Select categories...</div>
+                            <div class="ms-options">
+                                <label class="ms-opt"><input type="checkbox" name="lessonCategoryCb" value="Career"> Career</label>
+                                <label class="ms-opt"><input type="checkbox" name="lessonCategoryCb" value="Education"> Education</label>
+                                <label class="ms-opt"><input type="checkbox" name="lessonCategoryCb" value="Finance"> Finance</label>
+                                <label class="ms-opt"><input type="checkbox" name="lessonCategoryCb" value="Health"> Health</label>
+                                <label class="ms-opt"><input type="checkbox" name="lessonCategoryCb" value="Personal"> Personal</label>
+                                <label class="ms-opt"><input type="checkbox" name="lessonCategoryCb" value="Other"> Other</label>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -322,7 +325,7 @@
             const all = lessons.filter(l => {
                 const matchQ   = !q || (l.title||'').toLowerCase().includes(q) || (l.body||'').toLowerCase().includes(q);
                 const matchTag = !tag || (l.tags||[]).includes(tag);
-                const matchCat = !cat || l.category === cat;
+                const matchCat = !cat || (l.categories && l.categories.includes(cat)) || l.category === cat;
                 return matchQ && matchTag && matchCat;
             });
 
@@ -354,11 +357,12 @@
             const card = document.createElement('div');
             card.className = 'pinned-card';
             const tagsHtml = (l.tags||[]).map(t => `<span class="meta-tag">${t}</span>`).join('');
+            const catsHtml = (l.categories || (l.category ? [l.category] : [])).map(c => `<span class="meta-tag cat-tag">${c.charAt(0).toUpperCase() + c.slice(1)}</span>`).join('');
             card.innerHTML = `
                 <div class="pinned-title">${l.title}</div>
                 <div class="pinned-body">${l.body}</div>
                 <div class="pinned-meta">
-                    ${l.category ? `<span class="meta-tag cat-tag">${l.category}</span>` : ''}
+                    ${catsHtml}
                     ${tagsHtml}
                 </div>
                 <div class="pinned-actions">
@@ -398,9 +402,9 @@
                 <div class="lc-body">${l.body}</div>
                 <div class="lc-footer">
                     <div class="lc-meta">
-                        ${l.category ? `<span class="meta-tag cat-tag">${l.category}</span>` : ''}
+                        ${(l.categories || (l.category ? [l.category] : [])).map(c => `<span class="meta-tag cat-tag">${c.charAt(0).toUpperCase() + c.slice(1)}</span>`).join('')}
                         ${tagsHtml}
-                        ${linkedDecisionTitle ? `<span class="lc-linked">🔗 ${linkedDecisionTitle}</span>` : ''}
+                        ${linkedDecisionTitle ? `<a class="lc-linked" href="Timeline page.html?decisionId=${l.decisionId}" style="text-decoration:none;">🔗 ${linkedDecisionTitle}</a>` : ''}
                     </div>
                     <span class="lc-date">${formatDate(l.date || l.createdAt)}</span>
                 </div>
@@ -459,7 +463,14 @@
             document.getElementById('lessonTitle').value    = l.title || '';
             document.getElementById('lessonBody').value     = l.body || '';
             document.getElementById('lessonDecision').value = l.decisionId || '';
-            document.getElementById('lessonCategory').value = l.category || '';
+            
+            // Handle categories array or fallback to string
+            const catsToSet = l.categories || (l.category ? [l.category] : []);
+            document.querySelectorAll('input[name="lessonCategoryCb"]').forEach(cb => {
+                cb.checked = catsToSet.includes(cb.value);
+                cb.dispatchEvent(new Event('change'));
+            });
+
             document.getElementById('lessonTags').value     = (l.tags||[]).join(', ');
             document.getElementById('lessonPinned').checked = l.pinned || false;
             modalOverlay.classList.add('open');
@@ -475,7 +486,7 @@
         function clearForm() {
             ['lessonTitle','lessonBody','lessonTags'].forEach(id => document.getElementById(id).value = '');
             document.getElementById('lessonDecision').value = '';
-            document.getElementById('lessonCategory').value = '';
+            document.querySelectorAll('input[name="lessonCategoryCb"]').forEach(cb => { cb.checked = false; cb.dispatchEvent(new Event('change')); });
             document.getElementById('lessonPinned').checked = false;
         }
 
@@ -508,7 +519,7 @@
                 title,
                 body,
                 decisionId: document.getElementById('lessonDecision').value,
-                category: document.getElementById('lessonCategory').value,
+                categories: Array.from(document.querySelectorAll('input[name="lessonCategoryCb"]:checked')).map(cb => cb.value),
                 tags,
                 pinned: document.getElementById('lessonPinned').checked,
             };
@@ -537,6 +548,26 @@
             }
         });
 
+        // Multi-select dropdown
+        document.querySelectorAll('.multi-select').forEach(ms => {
+            const header = ms.querySelector('.ms-header');
+            header.addEventListener('click', (e) => {
+                e.stopPropagation();
+                ms.classList.toggle('open');
+            });
+            ms.addEventListener('click', e => e.stopPropagation());
+            const checkboxes = ms.querySelectorAll('input[type="checkbox"]');
+            checkboxes.forEach(cb => {
+                cb.addEventListener('change', () => {
+                    const checked = Array.from(checkboxes).filter(c => c.checked).map(c => c.parentElement.textContent.trim());
+                    header.textContent = checked.length ? checked.join(', ') : 'Select categories...';
+                });
+            });
+        });
+        document.addEventListener('click', () => {
+            document.querySelectorAll('.multi-select').forEach(ms => ms.classList.remove('open'));
+        });
+
         // --- Write Lesson Draft Saving ---
         const lessonDraftKey = 'lessonDraft';
 
@@ -546,7 +577,7 @@
                 title: document.getElementById('lessonTitle').value,
                 body: document.getElementById('lessonBody').value,
                 decisionId: document.getElementById('lessonDecision').value,
-                category: document.getElementById('lessonCategory').value,
+                categories: Array.from(document.querySelectorAll('input[name="lessonCategoryCb"]:checked')).map(cb => cb.value),
                 tags: document.getElementById('lessonTags').value,
                 pinned: document.getElementById('lessonPinned').checked
             };
@@ -562,7 +593,12 @@
                 document.getElementById('lessonTitle').value = draft.title || '';
                 document.getElementById('lessonBody').value = draft.body || '';
                 document.getElementById('lessonDecision').value = draft.decisionId || '';
-                document.getElementById('lessonCategory').value = draft.category || '';
+                if (draft.categories) {
+                    document.querySelectorAll('input[name="lessonCategoryCb"]').forEach(cb => {
+                        cb.checked = draft.categories.includes(cb.value);
+                        cb.dispatchEvent(new Event('change'));
+                    });
+                }
                 document.getElementById('lessonTags').value = draft.tags || '';
                 document.getElementById('lessonPinned').checked = draft.pinned || false;
             } catch(e) {}
@@ -576,8 +612,11 @@
             });
         });
         document.getElementById('lessonTags').addEventListener('input', saveLessonDraft);
-        ['lessonDecision','lessonCategory','lessonPinned'].forEach(id => {
+        ['lessonDecision','lessonPinned'].forEach(id => {
             document.getElementById(id).addEventListener('change', saveLessonDraft);
+        });
+        document.querySelectorAll('input[name="lessonCategoryCb"]').forEach(cb => {
+            cb.addEventListener('change', saveLessonDraft);
         });
 
         /* ════ DELETE MODAL ════ */
