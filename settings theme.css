@@ -177,35 +177,76 @@
 
 /* ════ RESPONSIVE ════ */
 @media (max-width: 768px) {
-    header { padding: 0 16px; }
-    .profile-name { display: none; }
+    header {
+        padding: 0 16px;
+    }
+
+    .profile-name {
+        display: none;
+    }
 
     nav {
         position: fixed;
-        top: 60px; left: 0; right: 0;
-        width: 100%; height: auto;
+        top: 60px;
+        left: 0;
+        right: 0;
+        width: 100%;
+        height: auto;
         border-right: none;
         border-bottom: 1px solid var(--border);
-        padding: 0; z-index: 150;
-        overflow-x: auto; overflow-y: hidden;
+        padding: 0;
+        z-index: 150;
+        overflow-x: auto;
+        overflow-y: hidden;
     }
-    .links { flex-direction: row; gap: 0; margin-top: 0; width: max-content; }
+
+    .links {
+        flex-direction: row;
+        gap: 0;
+        margin-top: 0;
+        width: max-content;
+    }
+
     .links a {
-        padding: 12px 16px; border-radius: 0;
-        font-size: 13px; white-space: nowrap;
+        padding: 12px 16px;
+        border-radius: 0;
+        font-size: 13px;
+        white-space: nowrap;
         border-bottom: 2px solid transparent;
     }
-    .links a:hover, .links a.active {
-        background: transparent; color: var(--text);
+
+    .links a:hover,
+    .links a.active {
+        background: transparent;
+        color: var(--text);
         border-bottom-color: var(--purple);
     }
 
-    .body-wrap { margin-top: 60px; }
-    .main-content { margin-left: 0; padding: 80px 16px 24px; max-width: 100%; }
+    .body-wrap {
+        margin-top: 60px;
+    }
 
-    .settings-card { max-width: 100%; }
-    .field-row { flex-direction: column; gap: 12px; }
-    .card-footer { justify-content: stretch; }
-    .card-footer .btn { flex: 1; text-align: center; }
+    .main-content {
+        margin-left: 0;
+        padding: 80px 16px 24px;
+        max-width: 100%;
+    }
+
+    .settings-card {
+        max-width: 100%;
+    }
+
+    .field-row {
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .card-footer {
+        justify-content: stretch;
+    }
+
+    .card-footer .btn {
+        flex: 1;
+        text-align: center;
+    }
 }
-

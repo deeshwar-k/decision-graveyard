@@ -1,227 +1,231 @@
 <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <title>Settings – Decision Graveyard</title>
-        <link rel="preconnect" href="https://fonts.googleapis.com">
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
-        <link rel="stylesheet" href="home theme.css">
-        <link rel="stylesheet" href="settings theme.css">
-    </head>
-    <body>
 
-        <!-- HEADER -->
-        <header>
-            <a href="home page.html" class="header-logo">Decision <span>Graveyard</span></a>
-            <div class="profile">
-                <span class="profile-name">Name</span>
-                <div class="avatar" id="avatarBtn">N</div>
-                <div class="dropdown" id="dropdown">
-                    <p>Name</p>
-                    <hr>
-                    <a href="settings.html">Settings</a>
-                    <a href="#" id="logoutBtn">Log out</a>
-                </div>
+<head>
+    <meta charset="UTF-8">
+    <title>Settings – Decision Graveyard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600&family=DM+Sans:wght@400;500;600&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="home theme.css">
+    <link rel="stylesheet" href="settings theme.css">
+</head>
+
+<body>
+
+    <!-- HEADER -->
+    <header>
+        <a href="home page.html" class="header-logo">Decision <span>Graveyard</span></a>
+        <div class="profile">
+            <span class="profile-name">Name</span>
+            <div class="avatar" id="avatarBtn">N</div>
+            <div class="dropdown" id="dropdown">
+                <p>Name</p>
+                <hr>
+                <a href="settings.html">Settings</a>
+                <a href="#" id="logoutBtn">Log out</a>
             </div>
-        </header>
-
-        <div class="body-wrap">
-
-            <!-- SIDEBAR NAV -->
-            <nav>
-                <ul class="links">
-                    <li><a href="home page.html">🏠 Home</a></li>
-                    <li><a href="Decision_form.html">➕ Add Decision</a></li>
-                    <li><a href="Timeline page.html">📅 Timeline</a></li>
-                    <li><a href="insights.html">📊 Insights</a></li>
-                    <li><a href="lessons.html">📖 Lessons</a></li>
-                </ul>
-            </nav>
-
-            <!-- MAIN CONTENT -->
-            <main class="main-content">
-
-                <div class="hero">
-                    <h1 class="hero-title">Settings</h1>
-                    <p class="hero-sub">Manage your profile and account security.</p>
-                </div>
-
-                <div class="settings-card">
-
-                    <!-- Tab bar -->
-                    <div class="tab-bar">
-                        <button class="tab-btn active" data-tab="profile">Profile</button>
-                        <button class="tab-btn" data-tab="security">Security</button>
-                    </div>
-
-                    <!-- Profile tab -->
-                    <div class="tab-panel active" id="tab-profile">
-                        <div class="field-row">
-                            <div class="field-group">
-                                <label for="firstName">First name</label>
-                                <input type="text" id="firstName" placeholder="First name" value="Name">
-                            </div>
-                            <div class="field-group">
-                                <label for="lastName">Last name</label>
-                                <input type="text" id="lastName" placeholder="Last name">
-                            </div>
-                        </div>
-                        <div class="field-group">
-                            <label for="username">Username</label>
-                            <input type="text" id="username" placeholder="e.g. john_doe">
-                            <span class="field-hint">This is how your name appears across the app.</span>
-                        </div>
-                        <div class="field-group">
-                            <label for="email">Email address</label>
-                            <input type="email" id="email" placeholder="you@example.com">
-                        </div>
-                        <div class="card-footer">
-                            <button class="btn btn-ghost">Discard</button>
-                            <button class="btn btn-primary">Save changes</button>
-                        </div>
-                    </div>
-
-                    <!-- Security tab -->
-                    <div class="tab-panel" id="tab-security">
-                        <div class="field-group">
-                            <label for="currentPw">Current password</label>
-                            <input type="password" id="currentPw" placeholder="••••••••">
-                        </div>
-                        <div class="field-row">
-                            <div class="field-group">
-                                <label for="newPw">New password</label>
-                                <input type="password" id="newPw" placeholder="••••••••">
-                            </div>
-                            <div class="field-group">
-                                <label for="confirmPw">Confirm password</label>
-                                <input type="password" id="confirmPw" placeholder="••••••••">
-                            </div>
-                        </div>
-                        <span class="field-hint">At least 8 characters with one number or symbol.</span>
-                        <div class="card-footer">
-                            <button class="btn btn-primary">Update password</button>
-                        </div>
-                    </div>
-
-                </div>
-
-            </main>
         </div>
+    </header>
 
-        <script type="module">
-            import { auth, db } from './firebase-config.js';
-            import { onAuthStateChanged, updatePassword, signOut } from 'https://www.gstatic.com/firebasejs/10.10.0/firebase-auth.js';
-            import { doc, getDoc, updateDoc } from 'https://www.gstatic.com/firebasejs/10.10.0/firebase-firestore.js';
+    <div class="body-wrap">
 
-            document.getElementById('logoutBtn').addEventListener('click', async (e) => {
-                e.preventDefault();
-                await signOut(auth);
+        <!-- SIDEBAR NAV -->
+        <nav>
+            <ul class="links">
+                <li><a href="home page.html">🏠 Home</a></li>
+                <li><a href="Decision_form.html">➕ Add Decision</a></li>
+                <li><a href="Timeline page.html">📅 Timeline</a></li>
+                <li><a href="insights.html">📊 Insights</a></li>
+                <li><a href="lessons.html">📖 Lessons</a></li>
+            </ul>
+        </nav>
+
+        <!-- MAIN CONTENT -->
+        <main class="main-content">
+
+            <div class="hero">
+                <h1 class="hero-title">Settings</h1>
+                <p class="hero-sub">Manage your profile and account security.</p>
+            </div>
+
+            <div class="settings-card">
+
+                <!-- Tab bar -->
+                <div class="tab-bar">
+                    <button class="tab-btn active" data-tab="profile">Profile</button>
+                    <button class="tab-btn" data-tab="security">Security</button>
+                </div>
+
+                <!-- Profile tab -->
+                <div class="tab-panel active" id="tab-profile">
+                    <div class="field-row">
+                        <div class="field-group">
+                            <label for="firstName">First name</label>
+                            <input type="text" id="firstName" placeholder="First name" value="Name">
+                        </div>
+                        <div class="field-group">
+                            <label for="lastName">Last name</label>
+                            <input type="text" id="lastName" placeholder="Last name">
+                        </div>
+                    </div>
+                    <div class="field-group">
+                        <label for="username">Username</label>
+                        <input type="text" id="username" placeholder="e.g. john_doe">
+                        <span class="field-hint">This is how your name appears across the app.</span>
+                    </div>
+                    <div class="field-group">
+                        <label for="email">Email address</label>
+                        <input type="email" id="email" placeholder="you@example.com">
+                    </div>
+                    <div class="card-footer">
+                        <button class="btn btn-ghost">Discard</button>
+                        <button class="btn btn-primary">Save changes</button>
+                    </div>
+                </div>
+
+                <!-- Security tab -->
+                <div class="tab-panel" id="tab-security">
+                    <div class="field-group">
+                        <label for="currentPw">Current password</label>
+                        <input type="password" id="currentPw" placeholder="••••••••">
+                    </div>
+                    <div class="field-row">
+                        <div class="field-group">
+                            <label for="newPw">New password</label>
+                            <input type="password" id="newPw" placeholder="••••••••">
+                        </div>
+                        <div class="field-group">
+                            <label for="confirmPw">Confirm password</label>
+                            <input type="password" id="confirmPw" placeholder="••••••••">
+                        </div>
+                    </div>
+                    <span class="field-hint">At least 8 characters with one number or symbol.</span>
+                    <div class="card-footer">
+                        <button class="btn btn-primary">Update password</button>
+                    </div>
+                </div>
+
+            </div>
+
+        </main>
+    </div>
+
+    <script type="module">
+        import { auth, db } from './firebase-config.js';
+        import { onAuthStateChanged, updatePassword, signOut } from 'https://www.gstatic.com/firebasejs/10.10.0/firebase-auth.js';
+        import { doc, getDoc, updateDoc } from 'https://www.gstatic.com/firebasejs/10.10.0/firebase-firestore.js';
+
+        document.getElementById('logoutBtn').addEventListener('click', async (e) => {
+            e.preventDefault();
+            await signOut(auth);
+            window.location.href = 'Login page.html';
+        });
+
+        // Header dropdown
+        const avatar = document.getElementById('avatarBtn');
+        const dropdown = document.getElementById('dropdown');
+        avatar.addEventListener('click', function (e) {
+            e.stopPropagation();
+            dropdown.classList.toggle('open');
+        });
+        document.addEventListener('click', function () {
+            dropdown.classList.remove('open');
+        });
+        dropdown.addEventListener('click', function (e) {
+            e.stopPropagation();
+        });
+
+        // Tab switching
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', function () {
+                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+                this.classList.add('active');
+                document.getElementById('tab-' + this.dataset.tab).classList.add('active');
+            });
+        });
+
+        let currentUser = null;
+
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                currentUser = user;
+                await loadUserProfile();
+            } else {
                 window.location.href = 'Login page.html';
-            });
+            }
+        });
 
-            // Header dropdown
-            const avatar = document.getElementById('avatarBtn');
-            const dropdown = document.getElementById('dropdown');
-            avatar.addEventListener('click', function(e) {
-                e.stopPropagation();
-                dropdown.classList.toggle('open');
-            });
-            document.addEventListener('click', function() {
-                dropdown.classList.remove('open');
-            });
-            dropdown.addEventListener('click', function(e) {
-                e.stopPropagation();
-            });
+        async function loadUserProfile() {
+            const userDoc = await getDoc(doc(db, 'users', currentUser.uid));
+            if (userDoc.exists()) {
+                const data = userDoc.data();
+                document.getElementById('firstName').value = data.firstName || '';
+                document.getElementById('lastName').value = data.lastName || '';
+                document.getElementById('username').value = data.username || '';
+                document.getElementById('email').value = data.email || currentUser.email;
 
-            // Tab switching
-            document.querySelectorAll('.tab-btn').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-                    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
-                    this.classList.add('active');
-                    document.getElementById('tab-' + this.dataset.tab).classList.add('active');
+                let displayName = data.username || data.firstName || currentUser.email.split('@')[0];
+                document.querySelector('.profile-name').textContent = displayName;
+                document.querySelector('.dropdown p').textContent = displayName;
+                const init = displayName.charAt(0).toUpperCase();
+                document.getElementById('avatarBtn').textContent = init;
+            }
+        }
+
+        document.querySelector('#tab-profile .btn-primary').addEventListener('click', async (e) => {
+            if (!currentUser) return;
+            const btn = e.target;
+            const orig = btn.textContent;
+            btn.textContent = 'Saving...';
+
+            try {
+                await updateDoc(doc(db, 'users', currentUser.uid), {
+                    firstName: document.getElementById('firstName').value.trim(),
+                    lastName: document.getElementById('lastName').value.trim(),
+                    username: document.getElementById('username').value.trim(),
+                    email: document.getElementById('email').value.trim(),
                 });
-            });
+                btn.textContent = 'Saved!';
+                setTimeout(() => btn.textContent = orig, 2000);
+                loadUserProfile();
+            } catch (err) {
+                console.error(err);
+                btn.textContent = 'Error';
+                setTimeout(() => btn.textContent = orig, 2000);
+            }
+        });
 
-            let currentUser = null;
+        document.querySelector('#tab-security .btn-primary').addEventListener('click', async (e) => {
+            if (!currentUser) return;
+            const newPw = document.getElementById('newPw').value;
+            const confirmPw = document.getElementById('confirmPw').value;
 
-            onAuthStateChanged(auth, async (user) => {
-                if (user) {
-                    currentUser = user;
-                    await loadUserProfile();
-                } else {
-                    window.location.href = 'Login page.html';
-                }
-            });
-
-            async function loadUserProfile() {
-                const userDoc = await getDoc(doc(db, 'users', currentUser.uid));
-                if (userDoc.exists()) {
-                    const data = userDoc.data();
-                    document.getElementById('firstName').value = data.firstName || '';
-                    document.getElementById('lastName').value = data.lastName || '';
-                    document.getElementById('username').value = data.username || '';
-                    document.getElementById('email').value = data.email || currentUser.email;
-
-                    let displayName = data.username || data.firstName || currentUser.email.split('@')[0];
-                    document.querySelector('.profile-name').textContent = displayName;
-                    document.querySelector('.dropdown p').textContent = displayName;
-                    const init = displayName.charAt(0).toUpperCase();
-                    document.getElementById('avatarBtn').textContent = init;
-                }
+            if (!newPw || newPw !== confirmPw) {
+                alert('Passwords do not match or are empty');
+                return;
             }
 
-            document.querySelector('#tab-profile .btn-primary').addEventListener('click', async (e) => {
-                if (!currentUser) return;
-                const btn = e.target;
-                const orig = btn.textContent;
-                btn.textContent = 'Saving...';
-                
-                try {
-                    await updateDoc(doc(db, 'users', currentUser.uid), {
-                        firstName: document.getElementById('firstName').value.trim(),
-                        lastName: document.getElementById('lastName').value.trim(),
-                        username: document.getElementById('username').value.trim(),
-                        email: document.getElementById('email').value.trim(),
-                    });
-                    btn.textContent = 'Saved!';
-                    setTimeout(() => btn.textContent = orig, 2000);
-                    loadUserProfile();
-                } catch (err) {
-                    console.error(err);
-                    btn.textContent = 'Error';
-                    setTimeout(() => btn.textContent = orig, 2000);
-                }
-            });
+            const btn = e.target;
+            const orig = btn.textContent;
+            btn.textContent = 'Updating...';
 
-            document.querySelector('#tab-security .btn-primary').addEventListener('click', async (e) => {
-                if (!currentUser) return;
-                const newPw = document.getElementById('newPw').value;
-                const confirmPw = document.getElementById('confirmPw').value;
-                
-                if (!newPw || newPw !== confirmPw) {
-                    alert('Passwords do not match or are empty');
-                    return;
-                }
-                
-                const btn = e.target;
-                const orig = btn.textContent;
-                btn.textContent = 'Updating...';
+            try {
+                await updatePassword(currentUser, newPw);
+                btn.textContent = 'Updated!';
+                document.getElementById('newPw').value = '';
+                document.getElementById('confirmPw').value = '';
+                document.getElementById('currentPw').value = '';
+                setTimeout(() => btn.textContent = orig, 2000);
+            } catch (err) {
+                console.error(err);
+                alert(err.message);
+                btn.textContent = orig;
+            }
+        });
+    </script>
 
-                try {
-                    await updatePassword(currentUser, newPw);
-                    btn.textContent = 'Updated!';
-                    document.getElementById('newPw').value = '';
-                    document.getElementById('confirmPw').value = '';
-                    document.getElementById('currentPw').value = '';
-                    setTimeout(() => btn.textContent = orig, 2000);
-                } catch (err) {
-                    console.error(err);
-                    alert(err.message);
-                    btn.textContent = orig;
-                }
-            });
-        </script>
+</body>
 
-    </body>
 </html>

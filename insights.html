@@ -296,7 +296,7 @@
                 const insightsList = [
                     { icon: '📊', title: 'Data Logged', body: `You have logged ${stats.totalDecisions} decisions.` }
                 ];
-                
+
                 if (stats.successes > stats.failures) {
                     insightsList.push({ icon: '📈', title: 'Winning Streak', body: 'You have more successes than failures. Keep up the good work.' });
                 } else if (stats.failures > 0) {

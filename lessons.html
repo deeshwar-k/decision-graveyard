@@ -1,12 +1,15 @@
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <title>Lessons – Decision Graveyard</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600&family=DM+Sans:wght@400;500;600&display=swap"
+        rel="stylesheet">
     <link rel="stylesheet" href="lessons theme.css">
 </head>
+
 <body>
 
     <!-- HEADER -->
@@ -44,7 +47,8 @@
             <div class="hero">
                 <div class="hero-left">
                     <h1 class="hero-title">Lessons Learned</h1>
-                    <p class="hero-sub">Distilled wisdom from your decisions. Write rules you actually intend to keep.</p>
+                    <p class="hero-sub">Distilled wisdom from your decisions. Write rules you actually intend to keep.
+                    </p>
                 </div>
                 <button class="btn-primary" id="openWriteBtn">
                     <span class="btn-icon">✍</span> Write Lesson
@@ -117,12 +121,14 @@
             <div class="modal-body">
                 <div class="field-group">
                     <label class="field-label">Title <span class="req">*</span></label>
-                    <input type="text" class="field-input" id="lessonTitle" placeholder="e.g. Never skip the research phase">
+                    <input type="text" class="field-input" id="lessonTitle"
+                        placeholder="e.g. Never skip the research phase">
                 </div>
 
                 <div class="field-group">
                     <label class="field-label">Body <span class="req">*</span></label>
-                    <textarea class="field-textarea" id="lessonBody" rows="4" placeholder="What did you learn? What would you tell your past self?"></textarea>
+                    <textarea class="field-textarea" id="lessonBody" rows="4"
+                        placeholder="What did you learn? What would you tell your past self?"></textarea>
                 </div>
 
                 <div class="field-row">
@@ -137,12 +143,18 @@
                         <div class="multi-select" id="lessonCategorySelect">
                             <div class="ms-header" id="lessonCategoryHeader">Select categories...</div>
                             <div class="ms-options">
-                                <label class="ms-opt"><input type="checkbox" name="lessonCategoryCb" value="Career"> Career</label>
-                                <label class="ms-opt"><input type="checkbox" name="lessonCategoryCb" value="Education"> Education</label>
-                                <label class="ms-opt"><input type="checkbox" name="lessonCategoryCb" value="Finance"> Finance</label>
-                                <label class="ms-opt"><input type="checkbox" name="lessonCategoryCb" value="Health"> Health</label>
-                                <label class="ms-opt"><input type="checkbox" name="lessonCategoryCb" value="Personal"> Personal</label>
-                                <label class="ms-opt"><input type="checkbox" name="lessonCategoryCb" value="Other"> Other</label>
+                                <label class="ms-opt"><input type="checkbox" name="lessonCategoryCb" value="Career">
+                                    Career</label>
+                                <label class="ms-opt"><input type="checkbox" name="lessonCategoryCb" value="Education">
+                                    Education</label>
+                                <label class="ms-opt"><input type="checkbox" name="lessonCategoryCb" value="Finance">
+                                    Finance</label>
+                                <label class="ms-opt"><input type="checkbox" name="lessonCategoryCb" value="Health">
+                                    Health</label>
+                                <label class="ms-opt"><input type="checkbox" name="lessonCategoryCb" value="Personal">
+                                    Personal</label>
+                                <label class="ms-opt"><input type="checkbox" name="lessonCategoryCb" value="Other">
+                                    Other</label>
                             </div>
                         </div>
                     </div>
@@ -190,7 +202,8 @@
 
     <!-- ════ AI CHATBOT UI ════ -->
     <button class="chat-fab" id="chatFab">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+            stroke-linejoin="round">
             <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
         </svg>
     </button>
@@ -202,14 +215,16 @@
         </div>
         <div class="chat-messages" id="chatMessages">
             <div class="chat-msg ai-msg">
-                <div class="msg-bubble">Hello! I'm your Decision Graveyard AI. Ask me about your past decisions and lessons learned.</div>
+                <div class="msg-bubble">Hello! I'm your Decision Graveyard AI. Ask me about your past decisions and
+                    lessons learned.</div>
             </div>
         </div>
         <div id="chatRateNotice"></div>
         <div class="chat-input-area">
             <input type="text" id="chatInput" placeholder="Ask something..." autocomplete="off">
             <button id="chatSendBtn">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                    stroke-linejoin="round">
                     <line x1="22" y1="2" x2="11" y2="13"></line>
                     <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
                 </svg>
@@ -230,7 +245,7 @@
 
         // Avatar dropdown
         const avatarBtn = document.getElementById('avatarBtn');
-        const dropdown  = document.getElementById('dropdown');
+        const dropdown = document.getElementById('dropdown');
         avatarBtn.addEventListener('click', e => { e.stopPropagation(); dropdown.classList.toggle('open'); });
         document.addEventListener('click', () => dropdown.classList.remove('open'));
         dropdown.addEventListener('click', e => e.stopPropagation());
@@ -238,7 +253,7 @@
         let currentUser = null;
         let lessons = [];
         let allDecisions = [];
-        let editingId  = null;
+        let editingId = null;
         let deletingId = null;
 
         onAuthStateChanged(auth, async (user) => {
@@ -296,7 +311,7 @@
         /* ── Populate tag filter ── */
         function rebuildTagFilter() {
             const tagSet = new Set();
-            lessons.forEach(l => (l.tags||[]).forEach(t => tagSet.add(t)));
+            lessons.forEach(l => (l.tags || []).forEach(t => tagSet.add(t)));
             const sel = document.getElementById('tagFilter');
             const cur = sel.value;
             sel.innerHTML = '<option value="">All Tags</option>';
@@ -310,38 +325,38 @@
 
         /* ── Render ── */
         function render() {
-            const q    = document.getElementById('searchInput').value.toLowerCase();
-            const tag  = document.getElementById('tagFilter').value;
-            const cat  = document.getElementById('categoryFilter').value;
+            const q = document.getElementById('searchInput').value.toLowerCase();
+            const tag = document.getElementById('tagFilter').value;
+            const cat = document.getElementById('categoryFilter').value;
 
             const pinned = lessons.filter(l => l.pinned);
             const pinnedSection = document.getElementById('pinnedSection');
-            const pinnedGrid    = document.getElementById('pinnedGrid');
+            const pinnedGrid = document.getElementById('pinnedGrid');
 
             pinnedSection.style.display = pinned.length ? 'block' : 'none';
             pinnedGrid.innerHTML = '';
             pinned.forEach(l => pinnedGrid.appendChild(makePinnedCard(l)));
 
             const all = lessons.filter(l => {
-                const matchQ   = !q || (l.title||'').toLowerCase().includes(q) || (l.body||'').toLowerCase().includes(q);
-                const matchTag = !tag || (l.tags||[]).includes(tag);
+                const matchQ = !q || (l.title || '').toLowerCase().includes(q) || (l.body || '').toLowerCase().includes(q);
+                const matchTag = !tag || (l.tags || []).includes(tag);
                 const matchCat = !cat || (l.categories && l.categories.includes(cat)) || l.category === cat;
                 return matchQ && matchTag && matchCat;
             });
 
-            const list  = document.getElementById('lessonsList');
+            const list = document.getElementById('lessonsList');
             const empty = document.getElementById('emptyState');
             const count = document.getElementById('lessonCount');
 
             list.innerHTML = '';
             if (all.length === 0) {
                 empty.style.display = 'flex';
-                list.style.display  = 'none';
-                count.textContent   = '0 lessons';
+                list.style.display = 'none';
+                count.textContent = '0 lessons';
             } else {
                 empty.style.display = 'none';
-                list.style.display  = 'flex';
-                count.textContent   = `${all.length} lesson${all.length !== 1 ? 's' : ''}`;
+                list.style.display = 'flex';
+                count.textContent = `${all.length} lesson${all.length !== 1 ? 's' : ''}`;
                 all.forEach((l, i) => {
                     const card = makeLessonCard(l);
                     card.style.animationDelay = `${i * 0.04}s`;
@@ -356,7 +371,7 @@
         function makePinnedCard(l) {
             const card = document.createElement('div');
             card.className = 'pinned-card';
-            const tagsHtml = (l.tags||[]).map(t => `<span class="meta-tag">${t}</span>`).join('');
+            const tagsHtml = (l.tags || []).map(t => `<span class="meta-tag">${t}</span>`).join('');
             const catsHtml = (l.categories || (l.category ? [l.category] : [])).map(c => `<span class="meta-tag cat-tag">${c.charAt(0).toUpperCase() + c.slice(1)}</span>`).join('');
             card.innerHTML = `
                 <div class="pinned-title">${l.title}</div>
@@ -377,8 +392,8 @@
         function makeLessonCard(l) {
             const card = document.createElement('div');
             card.className = 'lesson-card fade-in';
-            const tagsHtml = (l.tags||[]).map(t => `<span class="meta-tag">${t}</span>`).join('');
-            
+            const tagsHtml = (l.tags || []).map(t => `<span class="meta-tag">${t}</span>`).join('');
+
             let linkedDecisionTitle = '';
             if (l.decisionId) {
                 const dec = allDecisions.find(d => d.id === l.decisionId);
@@ -416,7 +431,7 @@
         document.addEventListener('click', async e => {
             const btn = e.target.closest('[data-action]');
             if (!btn) return;
-            const id     = btn.dataset.id; // id is string in Firestore
+            const id = btn.dataset.id; // id is string in Firestore
             const action = btn.dataset.action;
 
             if (action === 'edit') openEdit(id);
@@ -437,14 +452,14 @@
         document.getElementById('categoryFilter').addEventListener('change', render);
         document.getElementById('resetBtn').addEventListener('click', () => {
             document.getElementById('searchInput').value = '';
-            document.getElementById('tagFilter').value   = '';
+            document.getElementById('tagFilter').value = '';
             document.getElementById('categoryFilter').value = '';
             render();
         });
 
         /* ════ MODAL ════ */
         const modalOverlay = document.getElementById('modalOverlay');
-        const modal        = document.getElementById('modal');
+        const modal = document.getElementById('modal');
 
         function openWrite() {
             editingId = null;
@@ -460,10 +475,10 @@
             if (!l) return;
             editingId = id;
             document.getElementById('modalTitle').textContent = 'Edit Lesson';
-            document.getElementById('lessonTitle').value    = l.title || '';
-            document.getElementById('lessonBody').value     = l.body || '';
+            document.getElementById('lessonTitle').value = l.title || '';
+            document.getElementById('lessonBody').value = l.body || '';
             document.getElementById('lessonDecision').value = l.decisionId || '';
-            
+
             // Handle categories array or fallback to string
             const catsToSet = l.categories || (l.category ? [l.category] : []);
             document.querySelectorAll('input[name="lessonCategoryCb"]').forEach(cb => {
@@ -471,7 +486,7 @@
                 cb.dispatchEvent(new Event('change'));
             });
 
-            document.getElementById('lessonTags').value     = (l.tags||[]).join(', ');
+            document.getElementById('lessonTags').value = (l.tags || []).join(', ');
             document.getElementById('lessonPinned').checked = l.pinned || false;
             modalOverlay.classList.add('open');
             document.getElementById('lessonTitle').focus();
@@ -484,7 +499,7 @@
         }
 
         function clearForm() {
-            ['lessonTitle','lessonBody','lessonTags'].forEach(id => document.getElementById(id).value = '');
+            ['lessonTitle', 'lessonBody', 'lessonTags'].forEach(id => document.getElementById(id).value = '');
             document.getElementById('lessonDecision').value = '';
             document.querySelectorAll('input[name="lessonCategoryCb"]').forEach(cb => { cb.checked = false; cb.dispatchEvent(new Event('change')); });
             document.getElementById('lessonPinned').checked = false;
@@ -497,9 +512,9 @@
 
         document.getElementById('saveBtn').addEventListener('click', async (e) => {
             const title = document.getElementById('lessonTitle').value.trim();
-            const body  = document.getElementById('lessonBody').value.trim();
+            const body = document.getElementById('lessonBody').value.trim();
             if (!title || !body) {
-                ['lessonTitle','lessonBody'].forEach(id => {
+                ['lessonTitle', 'lessonBody'].forEach(id => {
                     const el = document.getElementById(id);
                     if (!el.value.trim()) el.classList.add('field-error');
                 });
@@ -601,18 +616,18 @@
                 }
                 document.getElementById('lessonTags').value = draft.tags || '';
                 document.getElementById('lessonPinned').checked = draft.pinned || false;
-            } catch(e) {}
+            } catch (e) { }
         }
 
         /* Clear error highlight on input & Save Draft */
-        ['lessonTitle','lessonBody'].forEach(id => {
-            document.getElementById(id).addEventListener('input', function() {
+        ['lessonTitle', 'lessonBody'].forEach(id => {
+            document.getElementById(id).addEventListener('input', function () {
                 this.classList.remove('field-error');
                 saveLessonDraft();
             });
         });
         document.getElementById('lessonTags').addEventListener('input', saveLessonDraft);
-        ['lessonDecision','lessonPinned'].forEach(id => {
+        ['lessonDecision', 'lessonPinned'].forEach(id => {
             document.getElementById(id).addEventListener('change', saveLessonDraft);
         });
         document.querySelectorAll('input[name="lessonCategoryCb"]').forEach(cb => {
@@ -685,7 +700,7 @@
             if (save && text !== 'Thinking...') {
                 let history = [];
                 const saved = sessionStorage.getItem('aiChatHistory');
-                if (saved) { try { history = JSON.parse(saved); } catch(e){} }
+                if (saved) { try { history = JSON.parse(saved); } catch (e) { } }
                 history.push({ text, sender });
                 sessionStorage.setItem('aiChatHistory', JSON.stringify(history));
             }
@@ -701,7 +716,7 @@
                         chatMessages.innerHTML = ''; // clear default message
                         history.forEach(msg => addMessage(msg.text, msg.sender, false));
                     }
-                } catch(e) {}
+                } catch (e) { }
             }
         }
         loadChatHistory();
@@ -855,4 +870,5 @@
 
     </script>
 </body>
+
 </html>

@@ -1,7 +1,7 @@
 const { GoogleGenerativeAI } = require("@google/generative-ai");
 
 // ── Config ──────────────────────────────────────────────
-const GEMINI_API_KEY  = process.env.GEMINI_API_KEY;
+const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 const FIREBASE_API_KEY = process.env.FIREBASE_API_KEY; // Web API key from Firebase console
 
 // ── Handler ─────────────────────────────────────────────
@@ -41,7 +41,7 @@ module.exports = async function handler(req, res) {
                 body: JSON.stringify({ idToken: token }),
             }
         );
-        
+
         if (!verifyRes.ok) {
             const verifyErr = await verifyRes.json().catch(() => ({}));
             console.error("Firebase token verification failed:", verifyErr);
@@ -55,7 +55,7 @@ module.exports = async function handler(req, res) {
         }
 
         const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
-        
+
         // List of models to try in order of likelihood of having quota
         // Including 3.1 and 2.5 as requested by the user
         const modelsToTry = [
@@ -85,7 +85,7 @@ User's question: ${message}`;
                 result = await model.generateContent(prompt);
                 if (result && result.response) {
                     console.log(`Success with ${modelCfg.name}!`);
-                    break; 
+                    break;
                 }
             } catch (e) {
                 console.warn(`${modelCfg.name} failed:`, e.message);
@@ -98,7 +98,7 @@ User's question: ${message}`;
         if (!result || !result.response) {
             throw lastError || new Error("All models failed to respond.");
         }
-        
+
         if (!result || !result.response) {
             throw new Error("Empty response from Gemini API.");
         }
@@ -110,7 +110,7 @@ User's question: ${message}`;
 
     } catch (error) {
         console.error("AI Handler Exception:", error);
-        
+
         let clientMessage = `AI Error: ${error.message}`;
 
         if (error.message && error.message.includes("quota")) {
