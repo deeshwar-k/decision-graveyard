@@ -1,21 +1,23 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <title>Add Decision – Decision Graveyard</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600&family=DM+Sans:wght@400;500;600&display=swap"
-        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="home theme.css">
     <link rel="stylesheet" href="theme.css">
 </head>
-
 <body>
 
     <header>
-        <a href="#" class="header-logo">Decision <span>Graveyard</span></a>
+        <div class="header-left">
+                <button id="mobileMenuBtn" class="mobile-menu-btn" aria-label="Toggle Menu">
+                    <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+                </button>
+                <a href="home page.html" class="header-logo">Decision <span>Graveyard</span></a>
+            </div>
         <div class="profile">
             <span class="profile-name">Name</span>
             <div class="avatar" id="avatarBtn">N</div>
@@ -44,8 +46,7 @@
 
             <div class="hero">
                 <h1 class="hero-title">Bury a New Decision</h1>
-                <p class="hero-sub">Record the choices you've made — every detail helps you learn from the past and make
-                    better calls in the future.</p>
+                <p class="hero-sub">Record the choices you've made — every detail helps you learn from the past and make better calls in the future.</p>
             </div>
 
             <div class="form-card">
@@ -63,18 +64,12 @@
                             <div class="multi-select" id="fcategorySelect">
                                 <div class="ms-header" id="fcategoryHeader">Select categories...</div>
                                 <div class="ms-options">
-                                    <label class="ms-opt"><input type="checkbox" name="fcategory" value="career">
-                                        Career</label>
-                                    <label class="ms-opt"><input type="checkbox" name="fcategory" value="education">
-                                        Education</label>
-                                    <label class="ms-opt"><input type="checkbox" name="fcategory" value="finance">
-                                        Finance</label>
-                                    <label class="ms-opt"><input type="checkbox" name="fcategory" value="health">
-                                        Health</label>
-                                    <label class="ms-opt"><input type="checkbox" name="fcategory" value="personal">
-                                        Personal</label>
-                                    <label class="ms-opt"><input type="checkbox" name="fcategory" value="other">
-                                        Other</label>
+                                    <label class="ms-opt"><input type="checkbox" name="fcategory" value="career"> Career</label>
+                                    <label class="ms-opt"><input type="checkbox" name="fcategory" value="education"> Education</label>
+                                    <label class="ms-opt"><input type="checkbox" name="fcategory" value="finance"> Finance</label>
+                                    <label class="ms-opt"><input type="checkbox" name="fcategory" value="health"> Health</label>
+                                    <label class="ms-opt"><input type="checkbox" name="fcategory" value="personal"> Personal</label>
+                                    <label class="ms-opt"><input type="checkbox" name="fcategory" value="other"> Other</label>
                                 </div>
                             </div>
                         </div>
@@ -94,8 +89,7 @@
                     <div class="form-section-title">Context</div>
                     <div class="form-group">
                         <label>Situation</label>
-                        <textarea name="fsituation" rows="4"
-                            placeholder="Describe the situation you were in..."></textarea>
+                        <textarea name="fsituation" rows="4" placeholder="Describe the situation you were in..."></textarea>
                     </div>
                     <div class="form-group" style="margin-top: 16px;">
                         <label>Risk Level</label>
@@ -121,8 +115,7 @@
                     <div class="form-section-title">Reflection</div>
                     <div class="form-group">
                         <label>Thought Process</label>
-                        <textarea name="fthoughts" rows="4"
-                            placeholder="Walk through how you reasoned about this decision..."></textarea>
+                        <textarea name="fthoughts" rows="4" placeholder="Walk through how you reasoned about this decision..."></textarea>
                     </div>
                     <div class="form-row-2" style="margin-top: 16px;">
                         <div class="form-group">
@@ -176,10 +169,7 @@
             white-space: nowrap;
             font-family: 'DM Sans', sans-serif;
         }
-
-        .toast.show {
-            transform: translateX(-50%) translateY(0);
-        }
+        .toast.show { transform: translateX(-50%) translateY(0); }
     </style>
     <div class="toast" id="toast"></div>
 
@@ -235,13 +225,13 @@
                 const tagsRaw = document.querySelector('[name="ftags"]').value;
                 const tags = tagsRaw.split(',').map(t => t.trim()).filter(Boolean);
                 const situation = document.querySelector('[name="fsituation"]').value.trim();
-
+                
                 const levelOpt = document.querySelector('input[name="flevel"]:checked');
                 const riskLevel = levelOpt ? levelOpt.value : '';
 
                 const thoughts = document.querySelector('[name="fthoughts"]').value.trim();
                 const finalDecision = document.querySelector('[name="ffdecision"]').value.trim();
-
+                
                 const outcomeOpt = document.querySelector('input[name="foutcome"]:checked');
                 const outcome = outcomeOpt ? outcomeOpt.value : '';
 
@@ -262,7 +252,7 @@
                 // 2. Update Stats
                 const statsRef = doc(db, 'users', currentUser.uid, 'stats', 'overview');
                 const statsSnap = await getDoc(statsRef);
-
+                
                 if (statsSnap.exists()) {
                     const stats = statsSnap.data();
                     const newTotal = (stats.totalDecisions || 0) + 1;
@@ -306,20 +296,20 @@
         // Avatar dropdown
         const avatar = document.getElementById('avatarBtn');
         const dropdown = document.getElementById('dropdown');
-        avatar.addEventListener('click', function (e) {
+        avatar.addEventListener('click', function(e) {
             e.stopPropagation();
             dropdown.classList.toggle('open');
         });
-        document.addEventListener('click', function () {
+        document.addEventListener('click', function() {
             dropdown.classList.remove('open');
         });
-        dropdown.addEventListener('click', function (e) { e.stopPropagation(); });
+        dropdown.addEventListener('click', function(e) { e.stopPropagation(); });
 
         // Radio button styling
-        document.querySelectorAll('.radio-opt').forEach(function (opt) {
-            opt.addEventListener('click', function () {
+        document.querySelectorAll('.radio-opt').forEach(function(opt) {
+            opt.addEventListener('click', function() {
                 const group = this.dataset.group;
-                document.querySelectorAll('[data-group="' + group + '"]').forEach(function (o) {
+                document.querySelectorAll('[data-group="' + group + '"]').forEach(function(o) {
                     o.className = 'radio-opt';
                 });
                 this.classList.add('selected-' + this.dataset.val);
@@ -327,7 +317,7 @@
         });
 
         // Cancel button
-        document.querySelector('.btn.btn-ghost').addEventListener('click', function () {
+        document.querySelector('.btn.btn-ghost').addEventListener('click', function() {
             window.location.href = 'home page.html';
         });
 
@@ -339,7 +329,7 @@
                 ms.classList.toggle('open');
             });
             ms.addEventListener('click', e => e.stopPropagation());
-
+            
             const checkboxes = ms.querySelectorAll('input[type="checkbox"]');
             checkboxes.forEach(cb => {
                 cb.addEventListener('change', () => {
@@ -409,7 +399,7 @@
                         });
                     }
                 });
-            } catch (e) { }
+            } catch(e) {}
         }
 
         // Attach listeners
@@ -420,11 +410,11 @@
                 if (el.tagName === 'SELECT') el.addEventListener('change', saveDraft);
             }
         });
-
+        
         formCheckboxes.forEach(name => {
             document.querySelectorAll(`input[name="${name}"]`).forEach(cb => cb.addEventListener('change', saveDraft));
         });
-
+        
         // For radios, clicking the label updates the radio, but we need to ensure saveDraft runs after
         document.querySelectorAll('.radio-opt').forEach(opt => {
             opt.addEventListener('click', () => setTimeout(saveDraft, 0));
@@ -433,6 +423,21 @@
         document.addEventListener('DOMContentLoaded', loadDraft);
     </script>
 
-</body>
 
+    <script>
+        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+        const navMenu = document.querySelector('nav');
+        if (mobileMenuBtn && navMenu) {
+            mobileMenuBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                navMenu.classList.toggle('open');
+            });
+            document.addEventListener('click', (e) => {
+                if (navMenu.classList.contains('open') && !navMenu.contains(e.target) && !mobileMenuBtn.contains(e.target)) {
+                    navMenu.classList.remove('open');
+                }
+            });
+        }
+    </script>
+</body>
 </html>

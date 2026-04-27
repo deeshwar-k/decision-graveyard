@@ -1,185 +1,201 @@
 <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>Home – Decision Graveyard</title>
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="home theme.css">
+    </head>
+    <body>
 
-<head>
-    <meta charset="UTF-8">
-    <title>Home – Decision Graveyard</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600&family=DM+Sans:wght@400;500;600&display=swap"
-        rel="stylesheet">
-    <link rel="stylesheet" href="home theme.css">
-</head>
-
-<body>
-
-    <!-- HEADER -->
-    <header>
-        <a href="#" class="header-logo">Decision <span>Graveyard</span></a>
-        <div class="profile">
-            <span class="profile-name">Name</span>
-            <div class="avatar" id="avatarBtn">N</div>
-            <div class="dropdown" id="dropdown">
-                <p>Name</p>
-                <hr>
-                <a href="settings.html">Settings</a>
-                <a href="#" id="logoutBtn">Log out</a>
+        <!-- HEADER -->
+        <header>
+            <div class="header-left">
+                <button id="mobileMenuBtn" class="mobile-menu-btn" aria-label="Toggle Menu">
+                    <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+                </button>
+                <a href="home page.html" class="header-logo">Decision <span>Graveyard</span></a>
             </div>
+            <div class="profile">
+                <span class="profile-name">Name</span>
+                <div class="avatar" id="avatarBtn">N</div>
+                <div class="dropdown" id="dropdown">
+                    <p>Name</p>
+                    <hr>
+                    <a href="settings.html">Settings</a>
+                    <a href="#" id="logoutBtn">Log out</a>
+                </div>
+            </div>
+        </header>
+
+        <div class="body-wrap">
+
+            <!-- SIDEBAR NAV -->
+            <nav>
+                <ul class="links">
+                    <li><a href="home page.html" class="active">🏠 Home</a></li>
+                    <li><a href="Decision_form.html">➕ Add Decision</a></li>
+                    <li><a href="Timeline page.html">📅 Timeline</a></li>
+                    <li><a href="insights.html">📊 Insights</a></li>
+                    <li><a href="lessons.html">📖 Lessons</a></li>
+                </ul>
+            </nav>
+
+            <!-- MAIN CONTENT -->
+            <main class="main-content">
+
+                <!-- Hero / description -->
+                <div class="hero">
+                    <h1 class="hero-title">Your Decision Graveyard</h1>
+                    <p class="hero-sub">Every choice you've made is buried here — the wins, the regrets, and everything in between. Log them, revisit them, and let the patterns teach you something.</p>
+                </div>
+
+                <!-- Summary stats -->
+                <div class="stats-row">
+                    <div class="stat-card">
+                        <span class="stat-value" id="statTotal">-</span>
+                        <span class="stat-label">Total decisions</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-value" id="statRate">-</span>
+                        <span class="stat-label">Success rate</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-value" id="statCategory">-</span>
+                        <span class="stat-label">Most active category</span>
+                    </div>
+                </div>
+
+                <!-- Recent decisions -->
+                <div class="section">
+                    <h2 class="section-title">Recent decisions</h2>
+                    <div class="decision-list" id="recentDecisions">
+                        <div style="color:var(--text-muted); padding:20px 0;">Loading...</div>
+                    </div>
+                </div>
+
+            </main>
         </div>
-    </header>
 
-    <div class="body-wrap">
+        <script type="module">
+            import { auth, db } from './firebase-config.js';
+            import { onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.10.0/firebase-auth.js';
+            import { collection, getDocs, query, orderBy, limit, doc, getDoc } from 'https://www.gstatic.com/firebasejs/10.10.0/firebase-firestore.js';
 
-        <!-- SIDEBAR NAV -->
-        <nav>
-            <ul class="links">
-                <li><a href="home page.html" class="active">🏠 Home</a></li>
-                <li><a href="Decision_form.html">➕ Add Decision</a></li>
-                <li><a href="Timeline page.html">📅 Timeline</a></li>
-                <li><a href="insights.html">📊 Insights</a></li>
-                <li><a href="lessons.html">📖 Lessons</a></li>
-            </ul>
-        </nav>
-
-        <!-- MAIN CONTENT -->
-        <main class="main-content">
-
-            <!-- Hero / description -->
-            <div class="hero">
-                <h1 class="hero-title">Your Decision Graveyard</h1>
-                <p class="hero-sub">Every choice you've made is buried here — the wins, the regrets, and everything in
-                    between. Log them, revisit them, and let the patterns teach you something.</p>
-            </div>
-
-            <!-- Summary stats -->
-            <div class="stats-row">
-                <div class="stat-card">
-                    <span class="stat-value" id="statTotal">-</span>
-                    <span class="stat-label">Total decisions</span>
-                </div>
-                <div class="stat-card">
-                    <span class="stat-value" id="statRate">-</span>
-                    <span class="stat-label">Success rate</span>
-                </div>
-                <div class="stat-card">
-                    <span class="stat-value" id="statCategory">-</span>
-                    <span class="stat-label">Most active category</span>
-                </div>
-            </div>
-
-            <!-- Recent decisions -->
-            <div class="section">
-                <h2 class="section-title">Recent decisions</h2>
-                <div class="decision-list" id="recentDecisions">
-                    <div style="color:var(--text-muted); padding:20px 0;">Loading...</div>
-                </div>
-            </div>
-
-        </main>
-    </div>
-
-    <script type="module">
-        import { auth, db } from './firebase-config.js';
-        import { onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.10.0/firebase-auth.js';
-        import { collection, getDocs, query, orderBy, limit, doc, getDoc } from 'https://www.gstatic.com/firebasejs/10.10.0/firebase-firestore.js';
-
-        document.getElementById('logoutBtn').addEventListener('click', async (e) => {
-            e.preventDefault();
-            await signOut(auth);
-            window.location.href = 'Login page.html';
-        });
-
-        const avatar = document.getElementById('avatarBtn');
-        const dropdown = document.getElementById('dropdown');
-        avatar.addEventListener('click', function (e) { e.stopPropagation(); dropdown.classList.toggle('open'); });
-        document.addEventListener('click', function () { dropdown.classList.remove('open'); });
-        dropdown.addEventListener('click', function (e) { e.stopPropagation(); });
-
-        let currentUser = null;
-
-        onAuthStateChanged(auth, async (user) => {
-            if (user) {
-                currentUser = user;
-                // Try to get username from Firestore or fallback to email
-                const userDoc = await getDoc(doc(db, 'users', user.uid));
-                let displayName = user.email.split('@')[0];
-                if (userDoc.exists()) {
-                    const data = userDoc.data();
-                    displayName = data.username || data.firstName || displayName;
-                }
-
-                document.querySelector('.profile-name').textContent = displayName;
-                document.querySelector('.dropdown p').textContent = displayName;
-                document.getElementById('avatarBtn').textContent = displayName.charAt(0).toUpperCase();
-
-                await loadHomeData();
-            } else {
+            document.getElementById('logoutBtn').addEventListener('click', async (e) => {
+                e.preventDefault();
+                await signOut(auth);
                 window.location.href = 'Login page.html';
-            }
-        });
+            });
 
-        async function loadHomeData() {
-            // 1. Load Stats
-            const statsSnap = await getDoc(doc(db, 'users', currentUser.uid, 'stats', 'overview'));
-            if (statsSnap.exists()) {
-                const stats = statsSnap.data();
-                document.getElementById('statTotal').textContent = stats.totalDecisions || 0;
+            const avatar = document.getElementById('avatarBtn');
+            const dropdown = document.getElementById('dropdown');
+            avatar.addEventListener('click', function(e) { e.stopPropagation(); dropdown.classList.toggle('open'); });
+            document.addEventListener('click', function() { dropdown.classList.remove('open'); });
+            dropdown.addEventListener('click', function(e) { e.stopPropagation(); });
 
-                let rate = 0;
-                const successes = stats.successes || 0;
-                const failures = stats.failures || 0;
-                if (successes + failures > 0) {
-                    rate = Math.round((successes / (successes + failures)) * 100);
-                }
-                document.getElementById('statRate').textContent = rate + '%';
+            let currentUser = null;
 
-                let maxCat = '-';
-                let maxVal = -1;
-                if (stats.outcomesByCategory) {
-                    for (const [cat, outcomes] of Object.entries(stats.outcomesByCategory)) {
-                        const t = (outcomes.success || 0) + (outcomes.failure || 0) + (outcomes.ongoing || 0);
-                        if (t > maxVal) { maxVal = t; maxCat = cat; }
+            onAuthStateChanged(auth, async (user) => {
+                if (user) {
+                    currentUser = user;
+                    // Try to get username from Firestore or fallback to email
+                    const userDoc = await getDoc(doc(db, 'users', user.uid));
+                    let displayName = user.email.split('@')[0];
+                    if (userDoc.exists()) {
+                        const data = userDoc.data();
+                        displayName = data.username || data.firstName || displayName;
                     }
+                    
+                    document.querySelector('.profile-name').textContent = displayName;
+                    document.querySelector('.dropdown p').textContent = displayName;
+                    document.getElementById('avatarBtn').textContent = displayName.charAt(0).toUpperCase();
+                    
+                    await loadHomeData();
+                } else {
+                    window.location.href = 'Login page.html';
                 }
-                if (maxVal > 0) {
-                    document.getElementById('statCategory').textContent = maxCat.charAt(0).toUpperCase() + maxCat.slice(1);
+            });
+
+            async function loadHomeData() {
+                // 1. Load Stats
+                const statsSnap = await getDoc(doc(db, 'users', currentUser.uid, 'stats', 'overview'));
+                if (statsSnap.exists()) {
+                    const stats = statsSnap.data();
+                    document.getElementById('statTotal').textContent = stats.totalDecisions || 0;
+                    
+                    let rate = 0;
+                    const successes = stats.successes || 0;
+                    const failures = stats.failures || 0;
+                    if (successes + failures > 0) {
+                        rate = Math.round((successes / (successes + failures)) * 100);
+                    }
+                    document.getElementById('statRate').textContent = rate + '%';
+
+                    let maxCat = '-';
+                    let maxVal = -1;
+                    if (stats.outcomesByCategory) {
+                        for (const [cat, outcomes] of Object.entries(stats.outcomesByCategory)) {
+                            const t = (outcomes.success||0) + (outcomes.failure||0) + (outcomes.ongoing||0);
+                            if (t > maxVal) { maxVal = t; maxCat = cat; }
+                        }
+                    }
+                    if (maxVal > 0) {
+                        document.getElementById('statCategory').textContent = maxCat.charAt(0).toUpperCase() + maxCat.slice(1);
+                    }
+                } else {
+                    document.getElementById('statTotal').textContent = '0';
+                    document.getElementById('statRate').textContent = '0%';
                 }
-            } else {
-                document.getElementById('statTotal').textContent = '0';
-                document.getElementById('statRate').textContent = '0%';
-            }
 
-            // 2. Load Recent Decisions
-            const q = query(collection(db, 'users', currentUser.uid, 'decisions'), orderBy('date', 'desc'), limit(3));
-            const snap = await getDocs(q);
+                // 2. Load Recent Decisions
+                const q = query(collection(db, 'users', currentUser.uid, 'decisions'), orderBy('date', 'desc'), limit(3));
+                const snap = await getDocs(q);
+                
+                const list = document.getElementById('recentDecisions');
+                list.innerHTML = '';
+                
+                if (snap.empty) {
+                    list.innerHTML = '<div style="color:var(--text-muted); padding:20px 0;">No decisions yet. Add one!</div>';
+                    return;
+                }
 
-            const list = document.getElementById('recentDecisions');
-            list.innerHTML = '';
+                const outcomeLabels = { success: 'Success', failure: 'Failure', ongoing: 'Still unfolding' };
 
-            if (snap.empty) {
-                list.innerHTML = '<div style="color:var(--text-muted); padding:20px 0;">No decisions yet. Add one!</div>';
-                return;
-            }
+                snap.forEach(d => {
+                    const data = d.data();
+                    const dateObj = new Date((data.date || '2000-01-01') + 'T00:00:00');
+                    const formattedDate = dateObj.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+                    const capCat = data.category ? (data.category.charAt(0).toUpperCase() + data.category.slice(1)) : 'Other';
 
-            const outcomeLabels = { success: 'Success', failure: 'Failure', ongoing: 'Still unfolding' };
-
-            snap.forEach(d => {
-                const data = d.data();
-                const dateObj = new Date((data.date || '2000-01-01') + 'T00:00:00');
-                const formattedDate = dateObj.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
-                const capCat = data.category ? (data.category.charAt(0).toUpperCase() + data.category.slice(1)) : 'Other';
-
-                const card = document.createElement('div');
-                card.className = `decision-card ${data.outcome || 'ongoing'}`;
-                card.innerHTML = `
+                    const card = document.createElement('div');
+                    card.className = `decision-card ${data.outcome || 'ongoing'}`;
+                    card.innerHTML = `
                         <div class="card-meta">${capCat} &middot; ${formattedDate}</div>
                         <div class="card-title">${data.title}</div>
                         <div class="card-outcome">${outcomeLabels[data.outcome] || 'Unknown'}</div>
                     `;
-                list.appendChild(card);
+                    list.appendChild(card);
+                });
+            }
+        </script>
+
+    
+    <script>
+        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+        const navMenu = document.querySelector('nav');
+        if (mobileMenuBtn && navMenu) {
+            mobileMenuBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                navMenu.classList.toggle('open');
+            });
+            document.addEventListener('click', (e) => {
+                if (navMenu.classList.contains('open') && !navMenu.contains(e.target) && !mobileMenuBtn.contains(e.target)) {
+                    navMenu.classList.remove('open');
+                }
             });
         }
     </script>
-
 </body>
-
 </html>

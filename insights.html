@@ -15,7 +15,12 @@
 
     <!-- HEADER -->
     <header>
-        <a href="home page.html" class="header-logo">Decision <span>Graveyard</span></a>
+        <div class="header-left">
+            <button id="mobileMenuBtn" class="mobile-menu-btn" aria-label="Toggle Menu">
+                <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+            </button>
+            <a href="home page.html" class="header-logo">Decision <span>Graveyard</span></a>
+        </div>
         <div class="profile">
             <span class="profile-name">Name</span>
             <div class="avatar" id="avatarBtn">N</div>
@@ -296,7 +301,7 @@
                 const insightsList = [
                     { icon: '📊', title: 'Data Logged', body: `You have logged ${stats.totalDecisions} decisions.` }
                 ];
-
+                
                 if (stats.successes > stats.failures) {
                     insightsList.push({ icon: '📈', title: 'Winning Streak', body: 'You have more successes than failures. Keep up the good work.' });
                 } else if (stats.failures > 0) {
@@ -316,6 +321,22 @@
                     callouts.appendChild(card);
                 });
             }
+        }
+    </script>
+
+    <script>
+        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+        const navMenu = document.querySelector('nav');
+        if (mobileMenuBtn && navMenu) {
+            mobileMenuBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                navMenu.classList.toggle('open');
+            });
+            document.addEventListener('click', (e) => {
+                if (navMenu.classList.contains('open') && !navMenu.contains(e.target) && !mobileMenuBtn.contains(e.target)) {
+                    navMenu.classList.remove('open');
+                }
+            });
         }
     </script>
 </body>
