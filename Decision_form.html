@@ -178,10 +178,17 @@
         import { onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.10.0/firebase-auth.js';
         import { collection, addDoc, doc, getDoc, updateDoc, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.10.0/firebase-firestore.js';
 
+        // Force reload when page is restored from bfcache to rerun auth checks
+        window.addEventListener('pageshow', (event) => {
+            if (event.persisted || (window.performance && window.performance.navigation.type === 2)) {
+                window.location.reload();
+            }
+        });
+
         document.getElementById('logoutBtn').addEventListener('click', async (e) => {
             e.preventDefault();
             await signOut(auth);
-            window.location.href = 'Login page.html';
+            window.location.replace('Login page.html');
         });
 
         let currentUser = null;
@@ -199,7 +206,7 @@
                 document.querySelector('.dropdown p').textContent = displayName;
                 document.getElementById('avatarBtn').textContent = displayName.charAt(0).toUpperCase();
             } else {
-                window.location.href = 'Login page.html';
+                window.location.replace('Login page.html');
             }
         });
 
