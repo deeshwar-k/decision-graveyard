@@ -264,8 +264,16 @@
 
 <script type="module">
     import { auth, db } from './firebase-config.js';
-    import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'https://www.gstatic.com/firebasejs/10.10.0/firebase-auth.js';
+    import { signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.10.0/firebase-auth.js';
     import { doc, setDoc, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.10.0/firebase-firestore.js';
+
+    let isRedirecting = false;
+
+    onAuthStateChanged(auth, (user) => {
+        if (user && !isRedirecting) {
+            window.location.replace('home page.html');
+        }
+    });
 
     window.doLogin = async function() {
         let ok = true;
@@ -285,15 +293,18 @@
         btn.textContent = 'Logging in\u2026';
         btn.disabled = true;
 
+        isRedirecting = true;
+
         try {
             await signInWithEmailAndPassword(auth, u, p);
             btn.textContent = 'Login';
             btn.disabled = false;
             showToast('\u2713 Logged in successfully');
             setTimeout(() => {
-                window.location.href = 'home page.html';
+                window.location.replace('home page.html');
             }, 500);
         } catch (error) {
+            isRedirecting = false;
             btn.textContent = 'Login';
             btn.disabled = false;
             let msg = 'Login failed';
@@ -336,6 +347,8 @@
         btn.textContent = 'Creating account\u2026';
         btn.disabled = true;
 
+        isRedirecting = true;
+
         try {
             const userCredential = await createUserWithEmailAndPassword(auth, em, pw);
             const user = userCredential.user;
@@ -362,11 +375,16 @@
                 outcomesByRisk: {}
             });
 
+            // Sign out immediately as user is auto-logged in, but UI instructs them to sign in
+            await signOut(auth);
+            isRedirecting = false;
+
             btn.textContent = 'Create Account';
             btn.disabled = false;
             showToast('\u2713 Account created! Please log in.');
             switchTab('login');
         } catch (error) {
+            isRedirecting = false;
             btn.textContent = 'Create Account';
             btn.disabled = false;
             let msg = 'Signup failed';
