@@ -1,8 +1,8 @@
 {
   "rewrites": [
     {
-      "source": "/auth/action",
-      "destination": "/reset-password.html"
+      "source": "/__/auth/:path*",
+      "destination": "https://decision-graveyard-c68dc.firebaseapp.com/__/auth/:path*"
     }
   ]
 }
